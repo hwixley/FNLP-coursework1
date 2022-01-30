@@ -145,6 +145,7 @@ def train_LM(corpus):
     :rtype: LgramModel
     :return: A padded letter bigram model based on nltk.model.NgramModel
     '''
+    print(corpus)
     raise NotImplementedError  # remove when you finish defining this function
 
     # subset the corpus to only include all-alpha tokens
