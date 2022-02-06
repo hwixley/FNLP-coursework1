@@ -145,14 +145,11 @@ def train_LM(corpus):
     :rtype: LgramModel
     :return: A padded letter bigram model based on nltk.model.NgramModel
     '''
-    print(corpus)
-    raise NotImplementedError  # remove when you finish defining this function
-
     # subset the corpus to only include all-alpha tokens
-    corpus_tokens = ...
-
+    words = [w for w in corpus.words(corpus.fileids()) if w.isalpha()]
+    
     # Return a smoothed padded bigram letter language model
-    return ...
+    return LgramModel(2, words, pad_left=True, pad_right=True)
 
 
 # Question 2 [7 marks]
