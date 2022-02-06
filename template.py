@@ -20,7 +20,11 @@ include generated answers.py file.
 
 Best of Luck!
 """
+from ast import operator
 from collections import defaultdict, Counter
+from lib2to3.pgen2 import token
+from operator import itemgetter
+from bleach import clean
 
 import numpy as np  # for np.mean() and np.std()
 import nltk, sys, inspect
@@ -166,19 +170,22 @@ def tweet_ent(file_name, bigram_model):
     :rtype: list(tuple(float,list(str)))
     :return: ordered list of average entropies and tweets'''
 
-    raise NotImplementedError # remove when you finish defining this function
+    #raise NotImplementedError # remove when you finish defining this function
 
     # Clean up the tweet corpus to remove all non-alpha
     # tokens and tweets with less than 5 (remaining) tokens, converted
     # to lowercase
     list_of_tweets = xtwc.sents(file_name)
-    cleaned_list_of_tweets = ...
+    cleaned_list_of_tweets = [[token for token in tweet if token.isalpha()] for tweet in list_of_tweets]
+    cleaned_list_of_tweets = [[token.lower() for token in clean_tweet] if len(clean_tweet) < 5 else clean_tweet for clean_tweet in cleaned_list_of_tweets]
 
     # Construct a list of tuples of the form: (entropy,tweet)
     #  for each tweet in the cleaned corpus, where entropy is the
     #  average word for the tweet, and return the list of
     #  (entropy,tweet) tuples sorted by entropy
+    list_of_tuples = [(max(Counter(tweet).items, key=itemgetter(1))[0] , tweet) for tweet in cleaned_list_of_tweets]
 
+    return sorted(list_of_tuples, key=itemgetter(1))
 
 # Question 3 [8 marks]
 def open_question_3():
