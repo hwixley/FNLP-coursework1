@@ -145,11 +145,13 @@ def train_LM(corpus):
     :rtype: LgramModel
     :return: A padded letter bigram model based on nltk.model.NgramModel
     '''
-    # subset the corpus to only include all-alpha tokens
-    words = [w for w in corpus.words(corpus.fileids()) if w.isalpha()]
+    # subset the corpus to only include all-alpha tokens,
+    # converted to lower-case (_after_ the all-alpha check)
+    corpus_tokens = [w.lower() for w in corpus.words(corpus.fileids()) if w.isalpha()]
     
-    # Return a smoothed padded bigram letter language model
-    return LgramModel(2, words, pad_left=True, pad_right=True)
+    # Return a smoothed (using the default estimator) padded bigram
+    # letter language model
+    return LgramModel(2, corpus_tokens, pad_left=True, pad_right=True)
 
 
 # Question 2 [7 marks]
@@ -167,7 +169,8 @@ def tweet_ent(file_name, bigram_model):
     raise NotImplementedError # remove when you finish defining this function
 
     # Clean up the tweet corpus to remove all non-alpha
-    # tokens and tweets with less than 5 (remaining) tokens
+    # tokens and tweets with less than 5 (remaining) tokens, converted
+    # to lowercase
     list_of_tweets = xtwc.sents(file_name)
     cleaned_list_of_tweets = ...
 
