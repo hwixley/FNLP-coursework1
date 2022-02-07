@@ -21,6 +21,7 @@ include generated answers.py file.
 Best of Luck!
 """
 from ast import operator
+from cgi import test
 from collections import defaultdict, Counter
 from lib2to3.pgen2 import token
 from operator import itemgetter
@@ -183,9 +184,13 @@ def tweet_ent(file_name, bigram_model):
     #  for each tweet in the cleaned corpus, where entropy is the
     #  average word for the tweet, and return the list of
     #  (entropy,tweet) tuples sorted by entropy
-    list_of_tuples = [(max(Counter(tweet).items, key=itemgetter(1))[0] , tweet) for tweet in cleaned_list_of_tweets]
+    ents = {idx: bigram_model.entropy(cleaned_list_of_tweets[idx]) for idx in range(len(cleaned_list_of_tweets))}
+    sorted_ents = sorted(ents.items(), key=lambda item: item[1])
+    list_of_tuples = [(item[1], cleaned_list_of_tweets[item[0]]) for item in sorted_ents]
 
-    return sorted(list_of_tuples, key=itemgetter(1))
+    return list_of_tuples
+
+
 
 # Question 3 [8 marks]
 def open_question_3():
