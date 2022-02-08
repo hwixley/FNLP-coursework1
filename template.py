@@ -187,7 +187,7 @@ def tweet_ent(file_name, bigram_model):
     ents = {idx: bigram_model.entropy(cleaned_list_of_tweets[idx]) for idx in range(len(cleaned_list_of_tweets))}
     sorted_ents = sorted(ents.items(), key=lambda item: item[1])
     list_of_tuples = [(item[1], cleaned_list_of_tweets[item[0]]) for item in sorted_ents]
-
+    print(cleaned_list_of_tweets[0:20])
     return list_of_tuples
 
 
@@ -221,7 +221,13 @@ def open_question_4() -> str:
     :rtype: str
     :return: your answer [500 chars max]
     '''
-    return inspect.cleandoc("""...""")[0:500]
+    return inspect.cleandoc("""
+    We should remove all non-English tweets from the corpus
+    as these characters/words are obviously not relevant for
+    developing an English NL model.
+    We can identify non-English tweets by checking if they contain 
+    non-English characters, or simply just using an existing
+    language detection model (ie. TextBlob).""")[0:500]
 
 
 # Question 5 [15 marks]
