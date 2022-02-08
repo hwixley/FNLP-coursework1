@@ -201,7 +201,16 @@ def open_question_3():
     :rtype: str
     :return: your answer [500 chars max]
     '''
-    return inspect.cleandoc("""...""")[0:500]
+    return inspect.cleandoc("""
+    The first tweets are all unit length and have a
+    single character. We can imagine these give smallest entropies
+    as they are less novel than a typical English sentence.
+    The last tweets mainly consisted of logograms from other
+    languages. This was to be expected given these languages are
+    evidently not likely to be used in an English tweet. However,
+    surprsingly the fourth last tweet consisted of English
+    characters with \"gt\" repeating 38 times indicating \"gt\"
+    must just have a high word entropy.""")[0:500]
 
 
 # Question 4 [8 marks]
