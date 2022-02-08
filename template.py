@@ -244,30 +244,29 @@ def tweet_filter(list_of_tweets_and_entropies):
     :return: mean, standard deviation, ascii tweets and entropies,
              non-English tweets and entropies
     '''
-    raise NotImplementedError  # remove when you finish defining this function
-
     # Find the "ascii" tweets - those in the lowest-entropy 90%
     #  of list_of_tweets_and_entropies
-    list_of_ascii_tweets_and_entropies = ...
+    idx = int(0.9*len(list_of_tweets_and_entropies))
+    list_of_ascii_tweets_and_entropies = list_of_tweets_and_entropies[0:idx]
 
     # Extract a list of just the entropy values
-    list_of_entropies = ...
+    list_of_entropies = [tweet[0] for tweet in list_of_ascii_tweets_and_entropies]
 
     # Compute the mean of entropy values for "ascii" tweets
-    mean = ...
+    mean = np.mean(list_of_entropies)
 
     # Compute their standard deviation
-    standard_deviation = ...
+    standard_deviation = np.std(list_of_entropies)
 
     # Get a list of "probably not English" tweets, that is
     #  "ascii" tweets with an entropy greater than (mean + std_dev))
-    threshold = ...
-    list_of_not_English_tweets_and_entropies = ...
-
+    threshold = mean + standard_deviation
+    list_of_not_English_tweets_and_entropies = [tweet for tweet in list_of_ascii_tweets_and_entropies if tweet[0] > threshold]
+    print(list_of_not_English_tweets_and_entropies[0:5])
     # Return mean, standard_deviation,
     #  list_of_ascii_tweets_and_entropies,
     #  list_of_not_English_tweets_and_entropies
-    return ...
+    return mean, standard_deviation, list_of_ascii_tweets_and_entropies, list_of_not_English_tweets_and_entropies
 
 
 # Question 6 [15 marks]
