@@ -31,7 +31,8 @@ import numpy as np  # for np.mean() and np.std()
 import nltk, sys, inspect
 import nltk.corpus.util
 from nltk import MaxentClassifier
-from nltk.corpus import brown, ppattach  # import corpora
+from nltk.corpus import brown, ppattach
+from sklearn.multiclass import OutputCodeClassifier  # import corpora
 
 # Import the Twitter corpus and LgramModel
 from nltk_model import *  # See the README inside the nltk_model folder for more information
@@ -262,7 +263,7 @@ def tweet_filter(list_of_tweets_and_entropies):
     #  "ascii" tweets with an entropy greater than (mean + std_dev))
     threshold = mean + standard_deviation
     list_of_not_English_tweets_and_entropies = [tweet for tweet in list_of_ascii_tweets_and_entropies if tweet[0] > threshold]
-    print(list_of_not_English_tweets_and_entropies[0:5])
+
     # Return mean, standard_deviation,
     #  list_of_ascii_tweets_and_entropies,
     #  list_of_not_English_tweets_and_entropies
@@ -312,7 +313,11 @@ class NaiveBayes:
         :rtype: set(any)
         :return: The set of all features used in the training data for all classes.
         """
-        raise NotImplementedError  # remove when you finish defining this function
+        vocab = set()
+        for item in data:
+            vocab.update(item[0])
+
+        return vocab
 
     @staticmethod
     def train(data, alpha, vocab):
