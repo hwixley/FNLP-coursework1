@@ -280,7 +280,13 @@ def open_question_6():
     :rtype: str
     :return: your answer [1000 chars max]
     """
-    return inspect.cleandoc("""...""")[:1000]
+    return inspect.cleandoc("""
+    Problems:
+    1. The magnitude of words in English implies the majority of these
+    entropies will be exponentially small.
+    2. Which words can be classified as "proper English"
+    3. 
+    """)[:1000]
 
 
 #############################################
@@ -342,11 +348,34 @@ class NaiveBayes:
             likelihood[c][f] = P(f|c)
         """
         assert alpha >= 0.0
-        raise NotImplementedError  # remove when you finish defining this function
+
+        list_classes = [el[1] for el in data]
+        class_counts = {c: list_classes.count(c) for c in list_classes}
+        classes = class_counts.keys()
+        counts = list(class_counts.values())
+
+        likelihood = {}
+        prior = {}
 
         # Compute raw frequency distributions
+        cfdist = nltk.ConditionalFreqDist()
+        for el in data:
+            for ftr in el[0]:
+                cfdist[el[1]][ftr] += 1
 
         # Compute prior (MLE). Compute likelihood with smoothing.
+        num_samples = np.sum(counts)
+        d = len(vocab)
+        prior = {}
+
+        for i, c in enumerate(classes):
+            prior[c] = counts[i]/num_samples
+            likelihood[c] = {}
+            for v in vocab:
+                likelihood[c][v] = (cfdist[c][v] + alpha)/(prior[c] + alpha*d)
+
+        return prior, likelihood
+
 
 
     def prob_classify(self, d):
