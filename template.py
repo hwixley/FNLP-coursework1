@@ -23,6 +23,7 @@ Best of Luck!
 from ast import operator
 from cgi import test
 from collections import defaultdict, Counter
+import enum
 from lib2to3.pgen2 import token
 from operator import itemgetter
 from bleach import clean
@@ -349,10 +350,13 @@ class NaiveBayes:
         """
         assert alpha >= 0.0
 
-        list_classes = [el[1] for el in data]
-        class_counts = {c: list_classes.count(c) for c in list_classes}
-        classes = class_counts.keys()
-        counts = list(class_counts.values())
+        dclasses = [el[1] for el in data]
+        classes = set(dclasses)
+        class_counts = {c: dclasses.count(c) for c in classes}
+
+        dftrs = [ftr for el in data for ftr in el[0]]
+        ftrs = set(dftrs)
+        ftr_counts = {f: dftrs.count(f) for f in ftrs}
 
         likelihood = {}
         prior = {}
@@ -364,15 +368,19 @@ class NaiveBayes:
                 cfdist[el[1]][ftr] += 1
 
         # Compute prior (MLE). Compute likelihood with smoothing.
-        num_samples = np.sum(counts)
-        d = len(vocab)
-        prior = {}
+        num_samples = np.sum(list(class_counts.values()))
+        num_ftrs = np.sum(list(ftr_counts.values()))
 
-        for i, c in enumerate(classes):
-            prior[c] = counts[i]/num_samples
+        for c in classes:
+            prior[c] = class_counts[c]/num_samples
             likelihood[c] = {}
             for v in vocab:
-                likelihood[c][v] = (cfdist[c][v] + alpha)/(prior[c] + alpha*d)
+                likelihood[c][v] = (cfdist[c].freq(v)*(ftr_counts[v]/num_ftrs) + alpha)/(prior[c] + alpha*len(ftrs))
+        
+        for v in vocab:
+            print(np.sum([likelihood[c][v] for c in classes]))
+            assert np.sum([likelihood[c][v] for c in classes]) == 1
+        assert np.sum(list(prior.values())) == 1
 
         return prior, likelihood
 
@@ -386,7 +394,33 @@ class NaiveBayes:
         :rtype: dict(str, float)
         :return: The probability p(c|d) for all classes as a dictionary.
         """
-        raise NotImplementedError  # remove when you finish defining this function
+        list_classes = [el[0] for el in d]
+        class_counts = {c: list_classes.count(c) for c in list_classes}
+        classes = class_counts.keys()
+        tot_ccount = np.sum(list(class_counts.values()))
+
+        list_features = [el[1] for el in d if el[1] in self.vocab]
+        ftr_counts = {f: list_features.count(f) for f in list_features}
+        ftrs = ftr_counts.keys()
+        tot_fcount = np.sum(list(class_counts.values()))
+        
+        cfdist = nltk.ConditionalFreqDist()
+        probs = {}
+        prior_f = {}
+
+        for c in classes:
+            probs[c] = {}
+            for f in ftrs:
+                cfdist[c][f] += 1
+
+        for c in classes:
+            for f in ftrs:
+                prior_c = class_counts[c]/tot_ccount
+                prior_f = ftr_counts[f]/tot_fcount
+                probs[c][f] = (cfdist[c][f]*prior_c)/prior_f
+
+        return probs
+        #raise NotImplementedError  # remove when you finish defining this function
 
     def classify(self, d):
         """
@@ -396,7 +430,20 @@ class NaiveBayes:
         :rtype: str
         :return: The most likely class.
         """
-        raise NotImplementedError  # remove when you finish defining this function
+        probs = self.prob_classify(d)
+        classes = probs.keys()
+
+        max_prob = 0
+        max_class = ""
+        for c in classes:
+            prob = np.sum(list(probs[c].values()))
+            if prob > max_prob:
+                max_class = c
+                max_prob = prob
+
+        return max_class
+
+        
 
 
 
