@@ -382,13 +382,15 @@ class NaiveBayes:
 
                 prob_cv = cfdist[c][v]/ftr_counts[v]
                 prob_v = ftr_counts[v]/num_ftrs
-                likelihood[c][v] = (prob_cv*prob_v)/prior[c]
+                likelihood[c][v] = ((prob_cv*prob_v) + alpha)/(prior[c] + alpha*len(vocab))
         
         #print(num_ftrs)
         for v in vocab:
         #    prior_f += ftr_counts[v]/num_ftrs
         #    l_sum += np.sum([likelihood[c][v] for c in classes])
-            assert np.sum([likelihood[c][v] for c in classes]) == 1
+            for c in classes:
+                assert likelihood[c][v] >= 0
+            #print(np.sum([likelihood[c][v] for c in classes]))
         #print(prior_f)
         #print(l_sum)
         #print(num_ftrs)
