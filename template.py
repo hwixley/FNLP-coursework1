@@ -320,11 +320,7 @@ class NaiveBayes:
         :rtype: set(any)
         :return: The set of all features used in the training data for all classes.
         """
-        vocab = set()
-        for item in data:
-            vocab.update(item[0])
-
-        return vocab
+        return {ftr for el in data for ftr in el[0]}
 
     @staticmethod
     def train(data, alpha, vocab):
@@ -362,10 +358,16 @@ class NaiveBayes:
         prior = {}
 
         # Compute raw frequency distributions
-        cfdist = nltk.ConditionalFreqDist()
+        #cfdist = nltk.ConditionalFreqDist()
+        cfdist = {}
         for el in data:
+            if not el[1] in cfdist.keys():
+                cfdist[el[1]] = {}
             for ftr in el[0]:
-                cfdist[el[1]][ftr] += 1
+                if ftr in cfdist[el[1]].keys():
+                    cfdist[el[1]][ftr] += 1
+                else:
+                    cfdist[el[1]][ftr] = 1
 
         # Compute prior (MLE). Compute likelihood with smoothing.
         num_samples = np.sum(list(class_counts.values()))
@@ -375,11 +377,21 @@ class NaiveBayes:
             prior[c] = class_counts[c]/num_samples
             likelihood[c] = {}
             for v in vocab:
-                likelihood[c][v] = (cfdist[c].freq(v)*(ftr_counts[v]/num_ftrs) + alpha)/(prior[c] + alpha*len(ftrs))
+                if not v in cfdist[c].keys():
+                    cfdist[c][v] = 0
+
+                prob_cv = cfdist[c][v]/ftr_counts[v]
+                prob_v = ftr_counts[v]/num_ftrs
+                likelihood[c][v] = (prob_cv*prob_v)/prior[c]
         
+        #print(num_ftrs)
         for v in vocab:
-            print(np.sum([likelihood[c][v] for c in classes]))
+        #    prior_f += ftr_counts[v]/num_ftrs
+        #    l_sum += np.sum([likelihood[c][v] for c in classes])
             assert np.sum([likelihood[c][v] for c in classes]) == 1
+        #print(prior_f)
+        #print(l_sum)
+        #print(num_ftrs)
         assert np.sum(list(prior.values())) == 1
 
         return prior, likelihood
@@ -394,32 +406,53 @@ class NaiveBayes:
         :rtype: dict(str, float)
         :return: The probability p(c|d) for all classes as a dictionary.
         """
-        list_classes = [el[0] for el in d]
-        class_counts = {c: list_classes.count(c) for c in list_classes}
-        classes = class_counts.keys()
-        tot_ccount = np.sum(list(class_counts.values()))
+        classes = set(self.likelihood.keys())
+        c_probs = {}
+        fc_probs = {}
 
-        list_features = [el[1] for el in d if el[1] in self.vocab]
-        ftr_counts = {f: list_features.count(f) for f in list_features}
-        ftrs = ftr_counts.keys()
-        tot_fcount = np.sum(list(class_counts.values()))
+        for c in classes:
+            fc_probs[c] = 1
+            for ftr in d:
+                if ftr in self.likelihood[c].keys():
+                    fc_probs[c] = fc_probs[c]*self.likelihood[c][ftr]
+                else:
+                    fc_probs[c] = 0
+            
+        #prior_f = np.sum([fc_probs[c] for c in classes])/len(classes)
+        #assert prior_f != 0
+
+        for c in classes:
+            c_probs[c] = self.prior[c]*fc_probs[c]#/prior_f
+
+        return c_probs
         
-        cfdist = nltk.ConditionalFreqDist()
-        probs = {}
-        prior_f = {}
 
-        for c in classes:
-            probs[c] = {}
-            for f in ftrs:
-                cfdist[c][f] += 1
+        #list_classes = [el[0] for el in d]
+        #class_counts = {c: list_classes.count(c) for c in list_classes}
+        #classes = class_counts.keys()
+        #tot_ccount = np.sum(list(class_counts.values()))
 
-        for c in classes:
-            for f in ftrs:
-                prior_c = class_counts[c]/tot_ccount
-                prior_f = ftr_counts[f]/tot_fcount
-                probs[c][f] = (cfdist[c][f]*prior_c)/prior_f
+        #list_features = [el[1] for el in d if el[1] in self.vocab]
+        #ftr_counts = {f: list_features.count(f) for f in list_features}
+        #ftrs = ftr_counts.keys()
+        #tot_fcount = np.sum(list(class_counts.values()))
+        
+        #cfdist = nltk.ConditionalFreqDist()
+        #probs = {}
+        #prior_f = {}
 
-        return probs
+        #for c in classes:
+        #    probs[c] = {}
+        #    for f in ftrs:
+        #        cfdist[c][f] += 1
+
+        #for c in classes:
+        #    for f in ftrs:
+        #        prior_c = class_counts[c]/tot_ccount
+        #        prior_f = ftr_counts[f]/tot_fcount
+        #        probs[c][f] = (cfdist[c][f]*prior_c)/prior_f
+
+        #return probs
         #raise NotImplementedError  # remove when you finish defining this function
 
     def classify(self, d):
@@ -436,10 +469,9 @@ class NaiveBayes:
         max_prob = 0
         max_class = ""
         for c in classes:
-            prob = np.sum(list(probs[c].values()))
-            if prob > max_prob:
+            if probs[c] > max_prob:
                 max_class = c
-                max_prob = prob
+                max_prob = probs[c]
 
         return max_class
 
