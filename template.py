@@ -407,7 +407,7 @@ class NaiveBayes:
         """
         classes = set(self.likelihood.keys())
         c_probs = {}
-        fc_probs = {}
+        #fc_probs = {}
 
         for c in classes:
             ftr_likelihoods = [self.likelihood[c][ftr] for ftr in d if ftr in self.vocab]
