@@ -387,9 +387,11 @@ class NaiveBayes:
                 likelihood[c][v] = ((prob_cv*prob_v) + alpha)/(prior[c] + alpha*len(vocab))
 
                 assert likelihood[c][v] >= 0
-            assert abs(np.sum(list(likelihood[c].values())) - 1) <= 1e-15
+            print(np.sum(list(likelihood[c].values())))
+            assert abs(np.sum(list(likelihood[c].values())) - 1) <= 1e-12
             assert prior[c] >= 0
-        assert abs(np.sum(list(prior.values())) - 1) <= 1e-15
+        print(np.sum(list(prior.values())))
+        assert abs(np.sum(list(prior.values())) - 1) <= 1e-12
 
         return prior, likelihood
 
@@ -408,16 +410,19 @@ class NaiveBayes:
         fc_probs = {}
 
         for c in classes:
-            fc_probs[c] = 1
-            for ftr in d:
-                if ftr in self.likelihood[c].keys():
-                    fc_probs[c] = fc_probs[c]*self.likelihood[c][ftr]
-                else:
-                    fc_probs[c] = 0
-            c_probs[c] = self.prior[c]*fc_probs[c] #/prior_f
-            
+            ftr_likelihoods = [self.likelihood[c][ftr] for ftr in d if ftr in self.vocab]
+            #f_prior = np.sum(ftr_likelihoods)/np.sum(list(self.likelihood[c].values()))
+            c_probs[c] = self.prior[c]*np.prod(ftr_likelihoods)#/f_prior
+            assert c_probs[c] >= 0
         #prior_f = np.sum([fc_probs[c] for c in classes])/len(classes)
         #assert prior_f != 0
+        tot_prob = np.sum(list(c_probs.values()))
+
+        for c in classes:
+            c_probs[c] = c_probs[c]/tot_prob
+
+        print(np.sum(list(c_probs.values())))
+        assert abs(np.sum(list(c_probs.values())) - 1) <= 1e-12
 
         return c_probs
 
@@ -431,16 +436,7 @@ class NaiveBayes:
         :return: The most likely class.
         """
         probs = self.prob_classify(d)
-        classes = probs.keys()
-
-        max_prob = 0
-        max_class = ""
-        for c in classes:
-            if probs[c] > max_prob:
-                max_class = c
-                max_prob = probs[c]
-
-        return max_class
+        return max(probs, key=probs.get)
 
         
 
