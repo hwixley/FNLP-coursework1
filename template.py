@@ -493,32 +493,61 @@ def your_feature_extractor(v, n1, p, n2):
     :return: A list of features produced by you.
     """
     data = [v, n1, p, n2]
+    strs = ["V", "N1", "P", "N2"]
+    ldata = [d.lower() for d in data]
+    #print(data)
     abc = "abcdefghijklmnopqrstuvwxyz"
+    primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,59,61,67,71,73,79,83,89,97,101,103]
+    #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
     vowels = "aeiou"
     features = []
 
-    for d in data:
-        features.append(len(d))
-        features.append(d[0].isupper())
-        features.append(d[0] in vowels)
-        features.append(d[0].lower())
-        features.append(d[-1].lower())
-        prod = 1
-        for i, c in enumerate(d):
-            idx = abc.find(c.lower())
-            prod = prod*idx
-        features.append(prod)
+    # Verb features
+    ed = False
+    ing = False
+    offset = 0
+    if "ed" == ldata[0][-2:]:
+        ed = True
+        offset = -2
+    elif "ing" == ldata[0][-3:]:
+        ing = True
+
+    features.append(("V-ed", ed))
+    features.append(("V-ing", ing))
+    features.append(("V_count", len(ldata[0])-offset))
+
+    for i,d in enumerate(data):
+        features.append((f"{strs[i]}_count",len(d)))
+        features.append((f"{strs[i]}_0upper",d[0].isupper()))
+        features.append((f"{strs[i]}_0vowel",d[0] in vowels))
+        features.append((f"{strs[i]}_0",d[0]))
+        features.append((f"{strs[i]}_-1",d[-1]))
+
+        vprod, tprod = 1, 1
+        vsum, tsum = 0, 0
+        for j,c in enumerate(d):
+            val = primes[abc.find(c.lower())]
+            vprod = vprod*val
+            vsum += val
+            if j>0 and j % 2 == 0:
+                tsum += (val - primes[abc.find(d[j-1].lower())])**2
+                tprod = tprod*(val - primes[abc.find(d[j-1].lower())])
+        features.append((f"{strs[i]}_vprod",vprod))
+        features.append((f"{strs[i]}_vsum",vsum))
+        features.append((f"{strs[i]}_tsum",tsum))
+        features.append((f"{strs[i]}_tprod",tprod))
+        
             #features.append(idx)
             #features.append(abc.find(c.lower())**2*d.lower().count(c.lower()))
 
         #for v in vowels:
             #features.append(d.lower().count(v))
         for letter in abc:
-            features.append(d.lower().count(letter))
-        features.append(np.sum([1 for c in d if c.isupper()]))
+            features.append((f"{strs[i]}-{letter}_count",d.lower().count(letter)))
+        features.append((f"{strs[i]}_upper_count",np.sum([1 for c in d if c.isupper()])))
 
     #raise NotImplementedError  # remove when you finish defining this function
-    print(len(features))
+    #print(len(features))
     return features
 
 
