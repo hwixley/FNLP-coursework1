@@ -387,10 +387,8 @@ class NaiveBayes:
                 likelihood[c][v] = ((prob_cv*prob_v) + alpha)/(prior[c] + alpha*len(vocab))
 
                 assert likelihood[c][v] >= 0
-            print(np.sum(list(likelihood[c].values())))
             assert abs(np.sum(list(likelihood[c].values())) - 1) <= 1e-12
             assert prior[c] >= 0
-        print(np.sum(list(prior.values())))
         assert abs(np.sum(list(prior.values())) - 1) <= 1e-12
 
         return prior, likelihood
@@ -407,21 +405,16 @@ class NaiveBayes:
         """
         classes = set(self.likelihood.keys())
         c_probs = {}
-        #fc_probs = {}
 
         for c in classes:
             ftr_likelihoods = [self.likelihood[c][ftr] for ftr in d if ftr in self.vocab]
-            #f_prior = np.sum(ftr_likelihoods)/np.sum(list(self.likelihood[c].values()))
-            c_probs[c] = self.prior[c]*np.prod(ftr_likelihoods)#/f_prior
+            c_probs[c] = self.prior[c]*np.prod(ftr_likelihoods)
             assert c_probs[c] >= 0
-        #prior_f = np.sum([fc_probs[c] for c in classes])/len(classes)
-        #assert prior_f != 0
-        tot_prob = np.sum(list(c_probs.values()))
 
+        tot_prob = np.sum(list(c_probs.values()))
         for c in classes:
             c_probs[c] = c_probs[c]/tot_prob
 
-        print(np.sum(list(c_probs.values())))
         assert abs(np.sum(list(c_probs.values())) - 1) <= 1e-12
 
         return c_probs
