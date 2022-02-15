@@ -442,7 +442,16 @@ def open_question_8() -> str:
     :rtype: str
     :return: Your answer of 500 characters maximum.
     """
-    return inspect.cleandoc("""...""")[:500]
+    return inspect.cleandoc("""
+    The best accuracy was achieved using a sequence of words. Indicating that
+    this model is most useful when passed a sequence of words.
+
+    My NB accuracy is worse than all LR scores in Table 1. I believe this
+    difference can mainly be attributed to the NB independence assumption
+    as this infers probability distributions about features that are likely
+    not true. Thus a model that does not assume any distribution would be
+    more useful.
+    """)[:500]
 
 
 # Feature extractors used in the table:
@@ -483,7 +492,33 @@ def your_feature_extractor(v, n1, p, n2):
     :rtype: list(any)
     :return: A list of features produced by you.
     """
-    raise NotImplementedError  # remove when you finish defining this function
+    data = [v, n1, p, n2]
+    abc = "abcdefghijklmnopqrstuvwxyz"
+    vowels = "aeiou"
+    features = []
+
+    for d in data:
+        features.append(len(d))
+        features.append(d[0].isupper())
+        features.append(d[0] in vowels)
+        features.append(d[0].lower())
+        features.append(d[-1].lower())
+        prod = 1
+        for i, c in enumerate(d):
+            idx = abc.find(c.lower())
+            prod = prod*idx
+        features.append(prod)
+            #features.append(idx)
+            #features.append(abc.find(c.lower())**2*d.lower().count(c.lower()))
+
+        #for v in vowels:
+            #features.append(d.lower().count(v))
+        for letter in abc:
+            features.append(d.lower().count(letter))
+        features.append(np.sum([1 for c in d if c.isupper()]))
+
+    #raise NotImplementedError  # remove when you finish defining this function
+    return features
 
 
 # Question 9.2 [10 marks]
