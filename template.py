@@ -518,6 +518,7 @@ def your_feature_extractor(v, n1, p, n2):
         features.append(np.sum([1 for c in d if c.isupper()]))
 
     #raise NotImplementedError  # remove when you finish defining this function
+    print(len(features))
     return features
 
 
