@@ -523,20 +523,30 @@ def your_feature_extractor(v, n1, p, n2):
         features.append((f"{strs[i]}_0",d[0]))
         features.append((f"{strs[i]}_-1",d[-1]))
 
-        vprod, tprod = 1, 1
-        vsum, tsum = 0, 0
+        vprod, tprod, sprod, uprod = 1, 1, 1, 1
+        vsum, tsum, ssum, usum = 0, 0, 0, 0
         for j,c in enumerate(d):
             val = primes[abc.find(c.lower())]
             vprod = vprod*val
             vsum += val
             if j>0 and j % 2 == 0:
                 tsum += (val - primes[abc.find(d[j-1].lower())])**2
-                tprod = tprod*(val - primes[abc.find(d[j-1].lower())])
+                tprod = tprod*(val - primes[abc.find(d[j-1].lower())])**2
+            if j>0 and j % 3 == 0:
+                ssum += (val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2)#/primes[abc.find(d[j-2].lower())]
+                sprod = sprod*((val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]))**2#/primes[abc.find(d[j-2].lower())])**2
+            if j>0 and j % 4 == 0:
+                usum += (val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2 - primes[abc.find(d[j-3].lower())]**3)#/primes[abc.find(d[j-2].lower())]
+                uprod = uprod*((val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2 - primes[abc.find(d[j-3].lower())]**3))**2#/primes[abc.find(d[j-2].lower())])**2
+
         features.append((f"{strs[i]}_vprod",vprod))
         features.append((f"{strs[i]}_vsum",vsum))
         features.append((f"{strs[i]}_tsum",tsum))
         features.append((f"{strs[i]}_tprod",tprod))
-        
+        features.append((f"{strs[i]}_ssum",ssum))
+        features.append((f"{strs[i]}_sprod",sprod))
+        features.append((f"{strs[i]}_usum",usum))
+        features.append((f"{strs[i]}_uprod",uprod))
             #features.append(idx)
             #features.append(abc.find(c.lower())**2*d.lower().count(c.lower()))
 
