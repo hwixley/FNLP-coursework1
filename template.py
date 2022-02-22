@@ -488,13 +488,13 @@ def dfunc(data, strs):
         #print(train_d.similar(d))
         #features.append((f"{strs[i]}_similar",train_d.similar(d)))
 
-        features.append((f"{strs[i]}_count",len(d)))
-        features.append((f"{strs[i]}_0upper",d[0].isupper()))
-        features.append((f"{strs[i]}_0vowel",d[0] in vowels))
-        features.append((f"{strs[i]}_0",d[0]))
-        features.append((f"{strs[i]}_-1",d[-1]))
-        features.append((f"{strs[i]}_0alpha", d[0].lower() in abc))
-        features.append((f"{strs[i]}_-1alpha", d[-1].lower() in abc))
+        #features.append((f"{strs[i]}_count",len(d)))
+        #features.append((f"{strs[i]}_0upper",d[0].isupper()))
+        #features.append((f"{strs[i]}_0vowel",d[0] in vowels))
+        #features.append((f"{strs[i]}_0",d[0]))
+        #features.append((f"{strs[i]}_-1",d[-1]))
+        #features.append((f"{strs[i]}_0alpha", d[0].lower() in abc))
+        #features.append((f"{strs[i]}_-1alpha", d[-1].lower() in abc))
 
         #alpha_count = 0
         vowel_count = 0
@@ -581,7 +581,7 @@ def your_feature_extractor(v, n1, p, n2):
     data = [v, n1, p, n2]
     ldata = [d.lower() for d in data]
     #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
-    features = []
+    features = [("v", v), ("n1", n1), ("p", p), ("n2", n2)]
 
     # Verb features
     ed = False
@@ -593,11 +593,13 @@ def your_feature_extractor(v, n1, p, n2):
     elif "ing" == ldata[0][-3:]:
         ing = True
 
-    features.append(("V-ed", ed))
-    features.append(("V-ing", ing))
-    features.append(("V_count", len(ldata[0])-offset))
+    #features.append(("V-ed", ed))
+    #features.append(("V-ing", ing))
+    #features.append(("V_count", len(ldata[0])-offset))
 
-    features = features + dfunc([v, p], ["V", "P"]) + dfunc([n1, n2], ["N1", "N2"]) + dfunc([n1, v], ["N1", "V"]) + dfunc([n2, v], ["N2", "V"])
+
+    #+ dfunc([p, n2], ["P", "N2"])
+    features = features + dfunc([n1, p], ["N1", "P"]) + dfunc([v, n1], ["V", "N1"]) + dfunc([v, n2], ["V", "N2"]) + dfunc([p, v], ["P", "V"]) # + dfunc([v, n1, p], ["V", "N1", "P"]) + dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
