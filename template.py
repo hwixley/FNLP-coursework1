@@ -599,7 +599,7 @@ def your_feature_extractor(v, n1, p, n2):
 
 
     #+ dfunc([p, n2], ["P", "N2"])
-    features = features + dfunc([n1, p], ["N1", "P"]) + dfunc([v, n1], ["V", "N1"]) + dfunc([v, n2], ["V", "N2"]) + dfunc([p, v], ["P", "V"]) # + dfunc([v, n1, p], ["V", "N1", "P"]) + dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
+    features = features + dfunc([n1, p], ["N1", "P"]) + dfunc([v, n1], ["V", "N1"]) + dfunc([v, n2], ["V", "N2"]) + dfunc([p, v], ["P", "V"]) + dfunc([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
