@@ -476,9 +476,92 @@ def feature_extractor_5(v, n1, p, n2):
     return [("v", v), ("n1", n1), ("p", p), ("n2", n2)]
 
 
+def dfunc(data, strs):
+    vowels = "aeiou"
+    abc = "abcdefghijklmnopqrstuvwxyz"
+    primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,59,61,67,71,73,79,83,89,97,101,103]
+    features = []
+
+    t_vprod, t_tprod, t_sprod, t_uprod = 1, 1, 1, 1
+    t_vsum, t_tsum, t_ssum, t_usum = 0, 0, 0, 0
+    for i,d in enumerate(data):
+        #print(train_d.similar(d))
+        #features.append((f"{strs[i]}_similar",train_d.similar(d)))
+
+        features.append((f"{strs[i]}_count",len(d)))
+        features.append((f"{strs[i]}_0upper",d[0].isupper()))
+        features.append((f"{strs[i]}_0vowel",d[0] in vowels))
+        features.append((f"{strs[i]}_0",d[0]))
+        features.append((f"{strs[i]}_-1",d[-1]))
+        features.append((f"{strs[i]}_0alpha", d[0].lower() in abc))
+        features.append((f"{strs[i]}_-1alpha", d[-1].lower() in abc))
+
+        #alpha_count = 0
+        vowel_count = 0
+        vprod, tprod, sprod, uprod = 1, 1, 1, 1
+        vsum, tsum, ssum, usum = 0, 0, 0, 0
+        for j,c in enumerate(d):
+            if c.lower() in vowels:
+                vowel_count += 1
+
+            val = primes[abc.find(c.lower())]
+            vprod = vprod*val
+            vsum += val
+            if j>0 and j % 2 == 0:
+                tsum += (val - primes[abc.find(d[j-1].lower())])**2
+                tprod = tprod*(val - primes[abc.find(d[j-1].lower())])**2
+            if j>0 and j % 3 == 0:
+                ssum += (val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2)#/primes[abc.find(d[j-2].lower())]
+                sprod = sprod*((val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]))**2#/primes[abc.find(d[j-2].lower())])**2
+            if j>0 and j % 4 == 0:
+                usum += (val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2 - primes[abc.find(d[j-3].lower())]**3)#/primes[abc.find(d[j-2].lower())]
+                uprod = uprod*((val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2 - primes[abc.find(d[j-3].lower())]**3))**2#/primes[abc.find(d[j-2].lower())])**2
+
+        #features.append(alpha_count) #(f"{strs[i]}_alpha_count",alpha_count))
+        #features.append(alpha_count/len(d)) #(f"{strs[i]}_alpha_mean",alpha_count/len(d)))
+        features.append(vowel_count) #(f"{strs[i]}_vowel_count",vowel_count))
+        features.append(vowel_count/len(d)) #(f"{strs[i]}_vowel_mean",vowel_count/len(d)))
+        features.append(vprod) #(f"{strs[i]}_vprod",vprod))
+        features.append(vsum) #(f"{strs[i]}_vsum",vsum))
+        features.append(tsum) #(f"{strs[i]}_tsum",tsum))
+        features.append(tprod) #(f"{strs[i]}_tprod",tprod))
+        features.append(ssum) #(f"{strs[i]}_ssum",ssum))
+        features.append(sprod) #(f"{strs[i]}_sprod",sprod))
+        features.append(usum) #(f"{strs[i]}_usum",usum))
+        features.append(uprod) #(f"{strs[i]}_uprod",uprod))
+            #features.append(idx)
+            #features.append(abc.find(c.lower())**2*d.lower().count(c.lower()))
+
+        #for v in vowels:
+            #features.append(d.lower().count(v))
+        for letter in abc:
+            features.append((f"{strs[i]}-{letter}_count",d.lower().count(letter)))
+        features.append((f"{strs[i]}_upper_count",np.sum([1 for c in d if c.isupper()])))
+
+        t_sprod = t_sprod*sprod
+        t_vprod = t_vprod*vprod
+        t_tprod = t_tprod*tprod
+        t_uprod = t_uprod*uprod
+        t_ssum += ssum
+        t_vsum += vsum
+        t_tsum += tsum
+        t_usum += usum
+
+        #features.append((f"{strs[i]}_alpha_count",t_alpha_count))
+        #features.append((f"{strs[i]}_vowel_count",t_vowel_count))
+        features.append((f"{strs[i]}_vprod",t_vprod))
+        features.append((f"{strs[i]}_vsum",t_vsum))
+        features.append((f"{strs[i]}_tsum",t_tsum))
+        features.append((f"{strs[i]}_tprod",t_tprod))
+        features.append((f"{strs[i]}_ssum",t_ssum))
+        features.append((f"{strs[i]}_sprod",t_sprod))
+        features.append((f"{strs[i]}_usum",t_usum))
+        features.append((f"{strs[i]}_uprod",t_uprod))
+    return features
+
 # Question 9.1 [5 marks]
 def your_feature_extractor(v, n1, p, n2):
-    """
+    """vsumvsum
     Takes the head words and produces a list of features. The features may
     be of any type as long as they are hashable.
     :type v: str
@@ -492,14 +575,12 @@ def your_feature_extractor(v, n1, p, n2):
     :rtype: list(any)
     :return: A list of features produced by you.
     """
+    #print(n1)
+    #train_d = nltk.Text(word.lower() for word in ppattach.words())
+
     data = [v, n1, p, n2]
-    strs = ["V", "N1", "P", "N2"]
     ldata = [d.lower() for d in data]
-    #print(data)
-    abc = "abcdefghijklmnopqrstuvwxyz"
-    primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,59,61,67,71,73,79,83,89,97,101,103]
     #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
-    vowels = "aeiou"
     features = []
 
     # Verb features
@@ -516,45 +597,7 @@ def your_feature_extractor(v, n1, p, n2):
     features.append(("V-ing", ing))
     features.append(("V_count", len(ldata[0])-offset))
 
-    for i,d in enumerate(data):
-        features.append((f"{strs[i]}_count",len(d)))
-        features.append((f"{strs[i]}_0upper",d[0].isupper()))
-        features.append((f"{strs[i]}_0vowel",d[0] in vowels))
-        features.append((f"{strs[i]}_0",d[0]))
-        features.append((f"{strs[i]}_-1",d[-1]))
-
-        vprod, tprod, sprod, uprod = 1, 1, 1, 1
-        vsum, tsum, ssum, usum = 0, 0, 0, 0
-        for j,c in enumerate(d):
-            val = primes[abc.find(c.lower())]
-            vprod = vprod*val
-            vsum += val
-            if j>0 and j % 2 == 0:
-                tsum += (val - primes[abc.find(d[j-1].lower())])**2
-                tprod = tprod*(val - primes[abc.find(d[j-1].lower())])**2
-            if j>0 and j % 3 == 0:
-                ssum += (val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2)#/primes[abc.find(d[j-2].lower())]
-                sprod = sprod*((val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]))**2#/primes[abc.find(d[j-2].lower())])**2
-            if j>0 and j % 4 == 0:
-                usum += (val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2 - primes[abc.find(d[j-3].lower())]**3)#/primes[abc.find(d[j-2].lower())]
-                uprod = uprod*((val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2 - primes[abc.find(d[j-3].lower())]**3))**2#/primes[abc.find(d[j-2].lower())])**2
-
-        features.append((f"{strs[i]}_vprod",vprod))
-        features.append((f"{strs[i]}_vsum",vsum))
-        features.append((f"{strs[i]}_tsum",tsum))
-        features.append((f"{strs[i]}_tprod",tprod))
-        features.append((f"{strs[i]}_ssum",ssum))
-        features.append((f"{strs[i]}_sprod",sprod))
-        features.append((f"{strs[i]}_usum",usum))
-        features.append((f"{strs[i]}_uprod",uprod))
-            #features.append(idx)
-            #features.append(abc.find(c.lower())**2*d.lower().count(c.lower()))
-
-        #for v in vowels:
-            #features.append(d.lower().count(v))
-        for letter in abc:
-            features.append((f"{strs[i]}-{letter}_count",d.lower().count(letter)))
-        features.append((f"{strs[i]}_upper_count",np.sum([1 for c in d if c.isupper()])))
+    features = features + dfunc([v, p], ["V", "P"]) + dfunc([n1, n2], ["N1", "N2"]) + dfunc([n1, v], ["N1", "V"]) + dfunc([n2, v], ["N2", "V"])
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
