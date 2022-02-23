@@ -575,31 +575,30 @@ def your_feature_extractor(v, n1, p, n2):
     :rtype: list(any)
     :return: A list of features produced by you.
     """
-    #print(n1)
-    #train_d = nltk.Text(word.lower() for word in ppattach.words())
-
-    data = [v, n1, p, n2]
-    ldata = [d.lower() for d in data]
+    #data = [v, n1, p, n2]
     #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
     features = [("v", v), ("n1", n1), ("p", p), ("n2", n2)]
 
     # Verb features
-    ed = False
-    ing = False
-    offset = 0
-    if "ed" == ldata[0][-2:]:
-        ed = True
-        offset = -2
-    elif "ing" == ldata[0][-3:]:
-        ing = True
-
+    #ed = False
+    #ing = False
+    #offset = 0
+    #if "ed" == ldata[0][-2:]:
+    #    ed = True
+    #    offset = -2
+    #elif "ing" == ldata[0][-3:]:
+    #    ing = True
     #features.append(("V-ed", ed))
     #features.append(("V-ing", ing))
     #features.append(("V_count", len(ldata[0])-offset))
 
 
     #+ dfunc([p, n2], ["P", "N2"])
-    features = features + dfunc([n1, p], ["N1", "P"]) + dfunc([v, n1], ["V", "N1"]) + dfunc([v, n2], ["V", "N2"]) + dfunc([p, v], ["P", "V"]) + dfunc([n2, p], ["N2", "P"]) #dfunc([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
+    #n1p = dfunc([n1, p], ["N1", "P"])
+    #n2p = dfunc([n2, p], ["N2", "P"])
+    n3p = [x + y for x,y in zip(dfunc([n1, p], ["N1", "P"]), dfunc([n2, p], ["N2", "P"]))]
+
+    features = features + dfunc([v, n1], ["V", "N1"]) + dfunc([v, n2], ["V", "N2"]) + dfunc([p, v], ["P", "V"]) + n3p #dfunc([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
