@@ -476,6 +476,75 @@ def feature_extractor_5(v, n1, p, n2):
     return [("v", v), ("n1", n1), ("p", p), ("n2", n2)]
 
 
+def parse_word(word, step):
+    primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,59,61,67,71,73,79,83,89,97,101,103,-105]
+    letters = "eariotnslcudpmhgbfywkvxzjq"
+
+    sum = 0
+    prod = 1
+    temp_sum = 0
+    temp_prod = 1
+    for i, c in enumerate(word):
+        idx = -1
+        if c.lower() in letters:
+            idx = letters.index(c.lower())
+
+        if i % step == 0:
+            sum += temp_sum*primes[idx]
+            prod = prod*(temp_prod + primes[idx])
+            temp_sum = 0
+            temp_prod = 1
+        else:
+            temp_sum += primes[idx]
+            temp_prod = temp_prod*primes[idx]
+
+    return sum, prod
+
+def parse_words(sums, prods):
+    N = len(sums)
+    S = len(sums[0])
+    assert(N == len(prods))
+    assert(S == len(prods[0]))
+    features = []
+
+    for j in range(S):
+        sum = 0
+        prod = 1
+        for i in range(N):
+            sum += sums[i][j]
+            prod = prod*prods[i][j]
+        features.append(sum)
+        features.append(prod)
+        
+    return features
+
+def dfunc2(data, strs):
+    #vowels = "aeiou"
+    #abc = "abcdefghijklmnopqrstuvwxyz"
+    features = []
+
+    sums = []
+    prods = []
+    for i, d in enumerate(data):
+        steps = [1,2,3]
+        sum_list = []
+        prod_list = []
+
+        for s in steps:
+            sum, prod = parse_word(d, s)
+            features.append((f"{strs[i]}_{s}_sum",sum))
+            features.append((f"{strs[i]}_{s}_prod",prod))
+            sum_list.append(sum)
+            prod_list.append(prod)
+
+        sums.append(sum_list)
+        prods.append(prod_list)
+
+    ftrs = parse_words(sums, prods)
+
+    return features + ftrs
+
+
 def dfunc(data, strs):
     vowels = "aeiou"
     abc = "abcdefghijklmnopqrstuvwxyz"
@@ -596,9 +665,9 @@ def your_feature_extractor(v, n1, p, n2):
     #+ dfunc([p, n2], ["P", "N2"])
     #n1p = dfunc([n1, p], ["N1", "P"])
     #n2p = dfunc([n2, p], ["N2", "P"])
-    n3p = [x + y for x,y in zip(dfunc([n1, p], ["N1", "P"]), dfunc([n2, p], ["N2", "P"]))]
+    #n3p = [x + y for x,y in zip(dfunc([n1, p], ["N1", "P"]), dfunc([n2, p], ["N2", "P"]))]
 
-    features = features + dfunc([v, n1], ["V", "N1"]) + dfunc([v, n2], ["V", "N2"]) + dfunc([p, v], ["P", "V"]) + n3p #dfunc([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
+    features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) #+ n3p #dfunc([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
