@@ -554,6 +554,8 @@ def parse_words(sums, prods):
             prod = prod*prods[i][j]
         features.append(sum)
         features.append(prod)
+        features.append(sum*prod)
+        features.append(sum + prod)
         
     return features
 
