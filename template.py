@@ -26,6 +26,7 @@ from collections import defaultdict, Counter
 import enum
 from lib2to3.pgen2 import token
 from operator import itemgetter
+from string import punctuation
 from bleach import clean
 
 import numpy as np  # for np.mean() and np.std()
@@ -476,9 +477,20 @@ def feature_extractor_5(v, n1, p, n2):
     return [("v", v), ("n1", n1), ("p", p), ("n2", n2)]
 
 
+# Q9.1: Supplementary Function
+# ----------------------------
+# Parse a word into 2 numerical values
+# ------------------------------------
+# Uses a step as a means to give more significance
+# to adjacent letter combinations (which also helps
+# prevent classifying 2 words with the same letters
+# as the same thing)
 def parse_word(word, step):
-    primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,59,61,67,71,73,79,83,89,97,101,103,-105]
-    letters = "eariotnslcudpmhgbfywkvxzjq"
+    # primes: used to hold the identifiers for all our characters
+    primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,59,61,67,71,73,79,83,89,97,101,103,107,109,113, 127, 131, 139, 149, 151, 157, 163, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, -269]
+    letters = "eariotnslcudpmhgbfywkvxzjq" # ordered by English letter frequency
+    numbers = "0123456789" # ascending order
+    punctuation = ".?!,:;'\"-$%&*()+#/" # arbitrary order
 
     sum = 0
     prod = 1
@@ -488,6 +500,11 @@ def parse_word(word, step):
         idx = -1
         if c.lower() in letters:
             idx = letters.index(c.lower())
+        elif c in numbers:
+            idx = 26 + numbers.index(c)
+        elif c in punctuation:
+            idx = 36 + punctuation.index(c)
+
 
         if i % step == 0:
             sum += temp_sum*primes[idx]
@@ -500,6 +517,11 @@ def parse_word(word, step):
 
     return sum, prod
 
+# Q9.1: Supplementary Function
+# ----------------------------
+# Extracts features from the numerical values associated
+# with these words (calculated in parse_word)
+# ------------------------------------------------------
 def parse_words(sums, prods):
     N = len(sums)
     S = len(sums[0])
@@ -518,6 +540,10 @@ def parse_words(sums, prods):
         
     return features
 
+# Q9.1: Supplementary Function
+# ----------------------------
+# Extracts features for the given word combinations
+# -------------------------------------------------
 def dfunc2(data, strs):
     #vowels = "aeiou"
     #abc = "abcdefghijklmnopqrstuvwxyz"
@@ -667,7 +693,7 @@ def your_feature_extractor(v, n1, p, n2):
     #n2p = dfunc([n2, p], ["N2", "P"])
     n3p = [x + y for x,y in zip(dfunc2([n1, p], ["N1", "P"]), dfunc2([n2, p], ["N2", "P"]))]
 
-    features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p #dfunc([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
+    features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p  + dfunc2([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
