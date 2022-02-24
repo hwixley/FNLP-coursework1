@@ -485,12 +485,21 @@ def feature_extractor_5(v, n1, p, n2):
 # to adjacent letter combinations (which also helps
 # prevent classifying 2 words with the same letters
 # as the same thing)
-def parse_word(word, step):
+def parse_word(word, step, str):
     # primes: used to hold the identifiers for all our characters
     #primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,59,61,67,71,73,79,83,89,97,101,103,107,109,113, 127, 131, 139, 149, 151, 157, 163, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, -269]
     letters = "eariotnslcudpmhgbfywkvxzjq" # ordered by English letter frequency
     #numbers = "0123456789" # ascending order
     #punctuation = ".?!,:;'\"-$%&*()+#/" # arbitrary order
+
+    features = []
+    features.append((f"{str}_count",len(word)))
+    features.append((f"{str}_0upper",word[0].isupper()))
+    features.append((f"{str}_0vowel", word[0].lower() in "aeiou"))
+    features.append((f"{str}_0", word[0]))
+    #features.append((f"{str}_-1plural",  word[-2:].lower() == "es" if len(word) > 1 else False))
+    #features.append((f"{str}_-1s",  word[-1].lower() == "s"))
+    features.append((f"{str}_-1", word[-1]))
 
     sum = 0
     prod = 1
@@ -517,7 +526,7 @@ def parse_word(word, step):
             temp_sum += ord(char) #primes[idx]
             temp_prod = temp_prod*ord(char) #primes[idx]
 
-    return sum, prod
+    return features, sum, prod
 
 # Q9.1: Supplementary Function
 # ----------------------------
@@ -559,7 +568,8 @@ def dfunc2(data, strs):
         prod_list = []
 
         for s in steps:
-            sum, prod = parse_word(d, s)
+            ftrs, sum, prod = parse_word(d, s, strs[i])
+            features = features + ftrs
             features.append((f"{strs[i]}_{s}_sum",sum))
             features.append((f"{strs[i]}_{s}_prod",prod))
             sum_list.append(sum)
