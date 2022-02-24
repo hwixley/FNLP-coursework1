@@ -476,6 +476,21 @@ def feature_extractor_4(v, n1, p, n2):
 def feature_extractor_5(v, n1, p, n2):
     return [("v", v), ("n1", n1), ("p", p), ("n2", n2)]
 
+# Q9.1: Supplementary Function
+# ----------------------------
+# Get features for the given word
+# -------------------------------
+def word_ftrs(word, str):
+    features = []
+    features.append((f"{str}_count",len(word)))
+    features.append((f"{str}_0upper",word[0].isupper()))
+    features.append((f"{str}_0vowel", word[0].lower() in "aeiou"))
+    features.append((f"{str}_0", word[0]))
+    #features.append((f"{str}_-1plural",  word[-2:].lower() == "es" if len(word) > 1 else False))
+    #features.append((f"{str}_-1s",  word[-1].lower() == "s"))
+    features.append((f"{str}_-1", word[-1]))
+
+    return features
 
 # Q9.1: Supplementary Function
 # ----------------------------
@@ -491,15 +506,6 @@ def parse_word(word, step, str):
     letters = "eariotnslcudpmhgbfywkvxzjq" # ordered by English letter frequency
     #numbers = "0123456789" # ascending order
     #punctuation = ".?!,:;'\"-$%&*()+#/" # arbitrary order
-
-    features = []
-    features.append((f"{str}_count",len(word)))
-    features.append((f"{str}_0upper",word[0].isupper()))
-    features.append((f"{str}_0vowel", word[0].lower() in "aeiou"))
-    features.append((f"{str}_0", word[0]))
-    #features.append((f"{str}_-1plural",  word[-2:].lower() == "es" if len(word) > 1 else False))
-    #features.append((f"{str}_-1s",  word[-1].lower() == "s"))
-    features.append((f"{str}_-1", word[-1]))
 
     sum = 0
     prod = 1
@@ -568,8 +574,7 @@ def dfunc2(data, strs):
         prod_list = []
 
         for s in steps:
-            ftrs, sum, prod = parse_word(d, s, strs[i])
-            features = features + ftrs
+            sum, prod = parse_word(d, s)
             features.append((f"{strs[i]}_{s}_sum",sum))
             features.append((f"{strs[i]}_{s}_prod",prod))
             sum_list.append(sum)
@@ -685,7 +690,7 @@ def your_feature_extractor(v, n1, p, n2):
     #data = [v, n1, p, n2]
     #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
     features = [("v", v), ("n1", n1), ("p", p), ("n2", n2)]
-
+    #features = features + word_ftrs(v, "v") + word_ftrs(n1, "n1") + word_ftrs(n2, "n2") + word_ftrs(p, "p")
     # Verb features
     #ed = False
     #ing = False
@@ -705,7 +710,7 @@ def your_feature_extractor(v, n1, p, n2):
     #n2p = dfunc([n2, p], ["N2", "P"])
     n3p = [x + y for x,y in zip(dfunc2([n1, p], ["N1", "P"]), dfunc2([n2, p], ["N2", "P"]))]
 
-    features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p  #+ dfunc2([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
+    features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p  + dfunc2([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
