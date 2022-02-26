@@ -521,23 +521,23 @@ def parse_word(word, step):
         #    idx = 26 + numbers.index(c)
         #elif c in punctuation:
         #    idx = 36 + punctuation.index(c)
-        char = c
+        c_id = ord(c)
         if c.isalpha():
-            char = c.lower()
-        elif c in string.punctuation:
-            char = "."
+            c_id = ord(c.lower())
+        else:
+            c_id = 0
 
         if i % step == 0:
             if step == 1:
-                sum += ord(char)
+                sum += c_id
             else:
-                sum += temp_sum*ord(char) #primes[idx]
-            prod = prod*(temp_prod + ord(char)) #primes[idx])
+                sum += temp_sum*c_id #primes[idx]
+            prod = prod*(temp_prod + c_id) #primes[idx])
             temp_sum = 0
             temp_prod = 1
         else:
-            temp_sum += ord(char) #primes[idx]
-            temp_prod = temp_prod*ord(char) #primes[idx]
+            temp_sum += c_id #primes[idx]
+            temp_prod = temp_prod*c_id #primes[idx]
 
     return sum, prod
 
