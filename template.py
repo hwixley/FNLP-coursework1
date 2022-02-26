@@ -549,9 +549,9 @@ def parse_words(sums, prods):
     assert(S == len(prods[0]))
     features = []
 
+    sum = 0
+    prod = 1
     for j in range(S):
-        sum = 0
-        prod = 1
         for i in range(N):
             sum += sums[i][j]
             prod = prod*prods[i][j]
