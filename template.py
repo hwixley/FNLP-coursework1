@@ -27,6 +27,8 @@ import enum
 from lib2to3.pgen2 import token
 from operator import itemgetter
 from string import punctuation
+import string
+from tokenize import String
 from bleach import clean
 
 import numpy as np  # for np.mean() and np.std()
@@ -522,6 +524,8 @@ def parse_word(word, step):
         char = c
         if c.isalpha():
             char = c.lower()
+        elif c in string.punctuation:
+            char = "."
 
         if i % step == 0:
             if step == 1:
