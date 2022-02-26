@@ -532,7 +532,7 @@ def parse_word(word, step):
                 sum += c_id
             else:
                 sum += temp_sum*c_id #primes[idx]
-            prod = prod*(temp_prod + c_id) #primes[idx])
+            prod = prod*(temp_prod - c_id) #primes[idx])
             temp_sum = 0
             temp_prod = 1
         else:
