@@ -552,7 +552,12 @@ def parse_words(sums, prods):
     sum = 0
     prod = 1
     for j in range(S):
+        tsum = 0
+        tprod = 1
+
         for i in range(N):
+            tsum += sums[i][j]
+            tprod = tprod*prods[i][j]
             sum += sums[i][j]
             prod = prod*prods[i][j]
         features.append(sum)
