@@ -178,23 +178,17 @@ def tweet_ent(file_name, bigram_model):
     # tokens and tweets with less than 5 (remaining) tokens, converted
     # to lowercase
     list_of_tweets = xtwc.sents(file_name)
-    #print(list_of_tweets[0:20])
     alpha_tweets = [[token.lower() for token in tweet if token.isalpha()] for tweet in list_of_tweets]
-    #print(alpha_tweets[0:20])
     cleaned_list_of_tweets = [alpha_tweet for alpha_tweet in alpha_tweets if len(alpha_tweet) >= 5]
-    #print(cleaned_list_of_tweets[0:20])
 
     # Construct a list of tuples of the form: (entropy,tweet)
     #  for each tweet in the cleaned corpus, where entropy is the
     #  average word for the tweet, and return the list of
     #  (entropy,tweet) tuples sorted by entropy
-    #np.mean([bigram_model.entropy([word, tweet[i+1]]) for i, word in enumerate(tweet) if i+1 < len(tweet)])/len(cleaned_list_of_tweets[idx])
-
-    #ents = {idx: bigram_model.entropy(cleaned_list_of_tweets[idx])/len(cleaned_list_of_tweets[idx]) for idx in range(len(cleaned_list_of_tweets))}
-    ents = {idx: np.sum([bigram_model.entropy(word) for word in tweet])/len(" ".join(tweet)) for idx, tweet in enumerate(cleaned_list_of_tweets)}
+    ents = {idx: np.mean([bigram_model.entropy(word, pad_left=True, pad_right=True, perItem=True) for word in tweet]) for idx, tweet in enumerate(cleaned_list_of_tweets)}
     sorted_ents = sorted(ents.items(), key=lambda item: item[1])
     list_of_tuples = [(item[1], cleaned_list_of_tweets[item[0]]) for item in sorted_ents]
-    #print(cleaned_list_of_tweets[0:20])
+
     return list_of_tuples
 
 
@@ -298,18 +292,21 @@ def open_question_6():
     So I will assume that this question refers to balanced genre corpora extracted from the Web.
 
     Experiment:
-    Evaluate varying English corpora on their relevance for such an experiment.
+    1. Find a British English corpora from the 21st-century with a balanced genre that has been
+    extracted from the web.
+    2. Tokenise the corpus (split sentences into words).
+    3. Compute a dictionary of word frequencies for all the words in the corpus.
+    4. Compute a dictionary of word priors by dividing the word frequency dictionary by the
+    sum of all frequencies.
+    5. Create a function that calculates entropy of a word using its prior (-prior*log(prior)).
+    4. Iterate this function over all unique words in the corpus and take the mean to get the
+    average word entropy for this corpus.
 
 
     1. Given Zipf's law we know that the frequency of any word is inversely proportional
     to its rank in the frequency table indicating the majority of words in English
     are rarely used. Thus almost making this metric insignificant as the average will likely
     be quite large.
-    the magnitude of words in English this can result in the sparse
-    data problem as some words may only occur very rarely or not at all. Thus
-    resulting in a large resulting a large entropy 
-    2. Which words can be classified as "proper English"
-    3. 
     """)[:1000]
 
 
@@ -793,7 +790,7 @@ def answers():
     print("Worst 10 english entropies:")
     worst10_ents = ents[-10:]
     ppEandT(worst10_ents)
-
+    
     print("*** Question 3 ***")
     answer_open_question_3 = open_question_3()
     print(answer_open_question_3)
@@ -870,7 +867,7 @@ def answers():
     answer_open_question_9 = open_question_9()
     print("Answer to open question:")
     print(answer_open_question_9)
-
+    
 
 
 
