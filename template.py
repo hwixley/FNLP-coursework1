@@ -181,7 +181,7 @@ def tweet_ent(file_name, bigram_model):
     # to lowercase
     list_of_tweets = xtwc.sents(file_name)
     cleaned_list_of_tweets = [[token for token in tweet if token.isalpha()] for tweet in list_of_tweets]
-    cleaned_list_of_tweets = [[token.lower() for token in clean_tweet] if len(clean_tweet) < 5 else clean_tweet for clean_tweet in cleaned_list_of_tweets]
+    cleaned_list_of_tweets = [[token.lower() for token in clean_tweet] for clean_tweet in cleaned_list_of_tweets if len(clean_tweet) >= 5]
 
     # Construct a list of tuples of the form: (entropy,tweet)
     #  for each tweet in the cleaned corpus, where entropy is the
@@ -190,7 +190,7 @@ def tweet_ent(file_name, bigram_model):
     ents = {idx: bigram_model.entropy(cleaned_list_of_tweets[idx]) for idx in range(len(cleaned_list_of_tweets))}
     sorted_ents = sorted(ents.items(), key=lambda item: item[1])
     list_of_tuples = [(item[1], cleaned_list_of_tweets[item[0]]) for item in sorted_ents]
-    print(cleaned_list_of_tweets[0:20])
+    #print(cleaned_list_of_tweets[0:20])
     return list_of_tuples
 
 
