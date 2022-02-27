@@ -174,20 +174,24 @@ def tweet_ent(file_name, bigram_model):
     :rtype: list(tuple(float,list(str)))
     :return: ordered list of average entropies and tweets'''
 
-    #raise NotImplementedError # remove when you finish defining this function
-
     # Clean up the tweet corpus to remove all non-alpha
     # tokens and tweets with less than 5 (remaining) tokens, converted
     # to lowercase
     list_of_tweets = xtwc.sents(file_name)
-    cleaned_list_of_tweets = [[token for token in tweet if token.isalpha()] for tweet in list_of_tweets]
-    cleaned_list_of_tweets = [[token.lower() for token in clean_tweet] for clean_tweet in cleaned_list_of_tweets if len(clean_tweet) >= 5]
+    #print(list_of_tweets[0:20])
+    alpha_tweets = [[token.lower() for token in tweet if token.isalpha()] for tweet in list_of_tweets]
+    #print(alpha_tweets[0:20])
+    cleaned_list_of_tweets = [alpha_tweet for alpha_tweet in alpha_tweets if len(alpha_tweet) >= 5]
+    #print(cleaned_list_of_tweets[0:20])
 
     # Construct a list of tuples of the form: (entropy,tweet)
     #  for each tweet in the cleaned corpus, where entropy is the
     #  average word for the tweet, and return the list of
     #  (entropy,tweet) tuples sorted by entropy
-    ents = {idx: bigram_model.entropy(cleaned_list_of_tweets[idx]) for idx in range(len(cleaned_list_of_tweets))}
+    #np.mean([bigram_model.entropy([word, tweet[i+1]]) for i, word in enumerate(tweet) if i+1 < len(tweet)])/len(cleaned_list_of_tweets[idx])
+
+    #ents = {idx: bigram_model.entropy(cleaned_list_of_tweets[idx])/len(cleaned_list_of_tweets[idx]) for idx in range(len(cleaned_list_of_tweets))}
+    ents = {idx: np.sum([bigram_model.entropy(word) for word in tweet])/len(" ".join(tweet)) for idx, tweet in enumerate(cleaned_list_of_tweets)}
     sorted_ents = sorted(ents.items(), key=lambda item: item[1])
     list_of_tuples = [(item[1], cleaned_list_of_tweets[item[0]]) for item in sorted_ents]
     #print(cleaned_list_of_tweets[0:20])
@@ -205,15 +209,14 @@ def open_question_3():
     :return: your answer [500 chars max]
     '''
     return inspect.cleandoc("""
-    The first tweets are all unit length and have a
-    single character. We can imagine these give smallest entropies
-    as they are less novel than a typical English sentence.
-    The last tweets mainly consisted of logograms from other
-    languages. This was to be expected given these languages are
-    evidently not likely to be used in an English tweet. However,
-    surprsingly the fourth last tweet consisted of English
-    characters with \"gt\" repeating 38 times indicating \"gt\"
-    must just have a high word entropy.""")[0:500]
+    The entropy values represent the average uncertainty the model
+    has with classifying all the words in the given tweet.
+    The first tweets are all English words, the most common being
+    conjunctions ("and"), noun articles ("the"), and nouns
+    ("weather", "love").
+    The last tweets mainly consisted of non-ASCII logograms from
+    other languages. This was to be expected given these languages
+    are evidently not likely to be used in an English tweet.""")[0:500]
 
 
 # Question 4 [8 marks]
@@ -225,12 +228,11 @@ def open_question_4() -> str:
     :return: your answer [500 chars max]
     '''
     return inspect.cleandoc("""
-    We should remove all non-English tweets from the corpus
+    We should remove all non-English tweets (non-ASCII) from the corpus
     as these characters/words are obviously not relevant for
     developing an English NL model.
     We can identify non-English tweets by checking if they contain 
-    non-English characters, or simply just using an existing
-    language detection model (ie. TextBlob).""")[0:500]
+    non-ASCII characters as ASCII is only used for the English language.""")[0:500]
 
 
 # Question 5 [15 marks]
@@ -284,8 +286,28 @@ def open_question_6():
     """
     return inspect.cleandoc("""
     Problems:
-    1. The magnitude of words in English implies the majority of these
-    entropies will be exponentially small.
+    1. English has been spoken for centuries and has evolved massively, using all the data across
+    these centuries together would not be useful due to completely different dialects. So I will
+    assume this question refers to the 21st century.
+    2. English is spoken in many different countries which has a direct affect on the typical
+    words used, structure of sentences, and even spelling (ie. British English vs. American English).
+    However, modelling the data from all these countries would not be useful as a single one and so
+    I will assume this question only refers to British English.
+    3. Corpora data typically have a genre based on where the data was scraped from (ie. Web News)
+    and thus these are not representative of typical English usage (ie. conversational English).
+    So I will assume that this question refers to balanced genre corpora extracted from the Web.
+
+    Experiment:
+    Evaluate varying English corpora on their relevance for such an experiment.
+
+
+    1. Given Zipf's law we know that the frequency of any word is inversely proportional
+    to its rank in the frequency table indicating the majority of words in English
+    are rarely used. Thus almost making this metric insignificant as the average will likely
+    be quite large.
+    the magnitude of words in English this can result in the sparse
+    data problem as some words may only occur very rarely or not at all. Thus
+    resulting in a large resulting a large entropy 
     2. Which words can be classified as "proper English"
     3. 
     """)[:1000]
