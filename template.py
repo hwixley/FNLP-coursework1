@@ -397,11 +397,11 @@ class NaiveBayes:
         ftr_counts = {f: dftrs.count(f) for f in ftrs}
 
         # Compute prior (MLE). Compute likelihood with smoothing.
-        num_samples = np.sum(list(class_counts.values()))
+        #num_samples = np.sum(list(class_counts.values()))
         num_ftrs = np.sum(list(ftr_counts.values()))
 
         for c in classes:
-            prior[c] = class_counts[c]/num_samples
+            prior[c] = class_counts[c]/len(data)
             likelihood[c] = {}
             for v in vocab:
                 if not v in cfdist[c].keys():
@@ -433,7 +433,7 @@ class NaiveBayes:
 
         for c in classes:
             ftr_likelihoods = [self.likelihood[c][ftr] for ftr in d if ftr in self.vocab]
-            c_probs[c] = self.prior[c]*np.prod(ftr_likelihoods)
+            c_probs[c] = np.prod(ftr_likelihoods)
             assert c_probs[c] >= 0
 
         tot_prob = np.sum(list(c_probs.values()))
@@ -787,7 +787,7 @@ def answers():
 
     global naive_bayes
     global acc_extractor_1, naive_bayes_acc, lr_acc, logistic_regression_model, dev_features
-    
+    """
     print("*** Part I***\n")
 
     print("*** Question 1 ***")
@@ -835,7 +835,7 @@ def answers():
     print("*** Question 6 ***")
     answer_open_question_6 = open_question_6()
     print(answer_open_question_6)
-
+    """
 
     print("*** Part II***\n")
 
@@ -865,7 +865,7 @@ def answers():
     #     lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
     #     print(f"Extractor {i}  |  {lr_acc*100}")
     
-
+    """
     print("*** Question 9 ***")
     training_features = apply_extractor(your_feature_extractor, ppattach.tuples("training"))
     dev_features = apply_extractor(your_feature_extractor, ppattach.tuples("devset"))
@@ -880,7 +880,7 @@ def answers():
     answer_open_question_9 = open_question_9()
     print("Answer to open question:")
     print(answer_open_question_9)
-    
+    """
 
 
 
