@@ -280,21 +280,26 @@ def open_question_6():
     """
     return inspect.cleandoc("""
     Problems:
-    1. English has been spoken for centuries and has evolved massively, using all the data across
-    these centuries together would not be useful due to completely different dialects. So I will
+    This question is rather vague because...
+    1. It does not detail the era of English.
+    English has been spoken for centuries and has evolved massively using all the data across
+    these centuries together would not be useful due to completely different dialects so I will
     assume this question refers to the 21st century.
-    2. English is spoken in many different countries which has a direct affect on the typical
-    words used, structure of sentences, and even spelling (ie. British English vs. American English).
-    However, modelling the data from all these countries would not be useful as a single one and so
-    I will assume this question only refers to British English.
-    3. Corpora data typically have a genre based on where the data was scraped from (ie. Web News)
+    2. It does not detail the dialect(s) of English.
+    Due to the fact that English is so widely spoken (many different countries) there are many
+    different dialects with various differences in the spelling of words (ie. British English vs.
+    American English). This is problematic as it would result in not representing equivalent words
+    ("colour" vs. "color") as the same thing. So I will assume the question refers to British
+    English.
+    3. It does not detail the genre of English.
+    Corpora data typically have a genre based on where the data was scraped from (ie. Web News)
     and thus these are not representative of typical English usage (ie. conversational English).
     So I will assume that this question refers to balanced genre corpora extracted from the Web.
 
     Experiment:
     1. Find a British English corpora from the 21st-century with a balanced genre that has been
     extracted from the web.
-    2. Tokenise the corpus (split sentences into words).
+    2. Perform necessary preprocessing: tokenise the corpus (split sentences into words).
     3. Compute a dictionary of word frequencies for all the words in the corpus.
     4. Compute a dictionary of word priors by dividing the word frequency dictionary by the
     sum of all frequencies.
@@ -755,7 +760,15 @@ def open_question_9():
     :rtype: str
     :return: Your answer of 1000 characters maximum.
     """
-    return inspect.cleandoc("""...""")[:1000]
+    return inspect.cleandoc("""
+    Feature templates:
+    Due to the fact models perform best with numerical data I wanted to create a way
+    to represent words and combinations of words numerically. In order to do this I
+    decided to use ord() to retrieve the ASCII code for each letter in a word and use
+    it to calculate values that would form as representations for the words to which
+    these letters belong.
+
+    """)[:1000]
 
 
 """
