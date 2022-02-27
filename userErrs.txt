@@ -1,0 +1,75 @@
+Exception in answer dict value computation:
+    [lm._N,
+                             lm.prob('h', 't'),
+                             lm.prob('u', 'q'),
+                             lm.prob('z', 'q'),
+                             lm.prob('j', ('<s>',), True),
+                             lm.prob('</s>', 'e', True)] -> NameError("name 'lm' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    best10_ents -> NameError("name 'best10_ents' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    worst10_ents -> NameError("name 'worst10_ents' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    answer_open_question_3 -> NameError("name 'answer_open_question_3' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    answer_open_question_4 -> NameError("name 'answer_open_question_4' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    mean -> NameError("name 'mean' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    std -> NameError("name 'std' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    best10_ascci_ents -> NameError("name 'best10_ascci_ents' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    worst10_ascci_ents -> NameError("name 'worst10_ascci_ents' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    best10_non_eng_ents -> NameError("name 'best10_non_eng_ents' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    worst10_non_eng_ents -> NameError("name 'worst10_non_eng_ents' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    answer_open_question_6 -> NameError("name 'answer_open_question_6' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    "".join(logistic_regression_model.classify(d) for (d, gold) in dev_features) -> NameError("name 'dev_features' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>
+Exception in answer dict value computation:
+    answer_open_question_9 -> NameError("name 'answer_open_question_9' is not defined")
+  File "/home/hwixley/Documents/4th-Year/FNLP/cwk1/autodrive_embed.py", line 55, in safeEval
+    return eval(expr,gdict)
+  File "<string>", line 1, in <module>

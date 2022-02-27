@@ -409,9 +409,13 @@ class NaiveBayes:
 
                 prob_cv = cfdist[c][v]/ftr_counts[v]
                 prob_v = ftr_counts[v]/num_ftrs
-                likelihood[c][v] = ((prob_cv*prob_v) + alpha)/(prior[c] + alpha*len(vocab))
-
+                likelihood[c][v] = ((prob_cv) + alpha)/(prior[c] + alpha*len(vocab))
                 assert likelihood[c][v] >= 0
+
+            tot_prob = np.sum(list(likelihood[c].values()))
+            for v in vocab:
+                likelihood[c][v] = likelihood[c][v]/tot_prob
+
             assert abs(np.sum(list(likelihood[c].values())) - 1) <= 1e-12
             assert prior[c] >= 0
         assert abs(np.sum(list(prior.values())) - 1) <= 1e-12
@@ -431,12 +435,20 @@ class NaiveBayes:
         classes = set(self.likelihood.keys())
         c_probs = {}
 
+        cftr_lh_count = {}
+        for ftr in d:
+            if ftr in self.vocab:
+                cftr_lh_count[ftr] = 0
+                for c in classes:
+                    cftr_lh_count[ftr] += self.likelihood[c][ftr]
+
         for c in classes:
-            ftr_likelihoods = [self.likelihood[c][ftr] for ftr in d if ftr in self.vocab]
+            ftr_likelihoods = [self.likelihood[c][ftr]/cftr_lh_count[ftr] for ftr in d if ftr in self.vocab]
             c_probs[c] = np.prod(ftr_likelihoods)
             assert c_probs[c] >= 0
 
         tot_prob = np.sum(list(c_probs.values()))
+        #print(tot_prob)
         for c in classes:
             c_probs[c] = c_probs[c]/tot_prob
 
@@ -506,6 +518,7 @@ def feature_extractor_5(v, n1, p, n2):
 # -------------------------------
 def word_ftrs(word, str):
     features = []
+    #features.append((f"{str}_steps", len(word)*)
     features.append((f"{str}_count",len(word)))
     features.append((f"{str}_0upper",word[0].isupper()))
     features.append((f"{str}_0vowel", word[0].lower() in "aeiou"))
@@ -588,6 +601,12 @@ def parse_words(sums, prods):
         features.append(prod)
         features.append(sum*prod)
         features.append(sum + prod)
+        #if j > 0:
+        #    features.append(tsum)
+        #    features.append(tprod)
+        #    features.append(tsum*tprod)
+        #    features.append(tsum + tprod)
+
         
     return features
 
@@ -836,7 +855,7 @@ def answers():
     answer_open_question_6 = open_question_6()
     print(answer_open_question_6)
     """
-
+    """
     print("*** Part II***\n")
 
     print("*** Question 7 ***")
@@ -847,7 +866,7 @@ def answers():
     print("*** Question 8 ***")
     answer_open_question_8 = open_question_8()
     print(answer_open_question_8)
-
+    """
     # This is the code that generated the results in the table of the CW:
 
     # A single iteration of suffices for logistic regression for the simple feature extractors.
@@ -865,7 +884,7 @@ def answers():
     #     lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
     #     print(f"Extractor {i}  |  {lr_acc*100}")
     
-    """
+    
     print("*** Question 9 ***")
     training_features = apply_extractor(your_feature_extractor, ppattach.tuples("training"))
     dev_features = apply_extractor(your_feature_extractor, ppattach.tuples("devset"))
@@ -880,7 +899,7 @@ def answers():
     answer_open_question_9 = open_question_9()
     print("Answer to open question:")
     print(answer_open_question_9)
-    """
+    
 
 
 
