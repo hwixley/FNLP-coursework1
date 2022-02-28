@@ -586,28 +586,39 @@ def parse_words(sums, prods):
     assert(S == len(prods[0]))
     features = []
 
-    sum = 0
-    prod = 1
+    suml, prodl, spl, s_pl = [], [], [], []
+
+    sum, prod = 0, 1
+    max_sum, max_prod, max_sp, max_s_p = -9e+10, -9e+10, -9e+10, -9e+10
     for j in range(S):
-        tsum = 0
-        tprod = 1
+        #tsum = 0
+        #tprod = 1
 
         for i in range(N):
-            tsum += sums[i][j]
-            tprod = tprod*prods[i][j]
+            #tsum += sums[i][j]
+            #tprod = tprod*prods[i][j]
             sum += sums[i][j]
             prod = prod*prods[i][j]
         features.append(sum) #, prod, sum*prod, sum + prod))
         features.append(prod)
         features.append(sum*prod)
         features.append(sum + prod)
-        #if j > 0:
-        #    features.append(tsum)
-        #    features.append(tprod)
-        #    features.append(tsum*tprod)
-        #    features.append(tsum + tprod)
+        """
+        suml.append(sum) #, prod, sum*prod, sum + prod))
+        prodl.append(prod)
+        spl.append(sum*prod)
+        s_pl.append(sum + prod)
 
-        
+        if sum > max_sum:
+            max_sum = sum
+        if prod > max_prod:
+            max_prod = prod
+        if spl[-1] > max_sp:
+            max_sp = sum*prod
+        if s_pl[-1] > max_s_p:
+            max_s_p = sum+prod
+    features = [el/max_sum for el in suml] + [el/max_prod for el in prod] +  [el/max_sp for el in spl] + [el/max_s_p for el in s_pl]
+    """
     return features
 
 # Q9.1: Supplementary Function
@@ -740,12 +751,22 @@ def your_feature_extractor(v, n1, p, n2):
     :rtype: list(any)
     :return: A list of features produced by you.
     """
-    #data = [v, n1, p, n2]
+    data = [v, n1, p, n2]
     #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
     features = [("v", v), ("n1", n1), ("p", p), ("n2", n2), ("n1-p", (n1, p)), ("n2-p", (n2, p)), ("v-n2", (v, n2)), ("v-p", (v, p))]
     features = features + word_ftrs(v, "v") + word_ftrs(n1, "n1") + word_ftrs(n2, "n2") + word_ftrs(p, "p")
     # Verb features
-    """
+
+    #features = features + [("v-p", v+p), ("n1-p", n1+p), ("n2-p", n2+p), ("n1-n2-p", n1+n2+p)]
+    ptags = [ptag[1] for ptag in nltk.pos_tag(data)]
+    features = features + ptags
+    #features = features + dfunc2(ptags[0:2], ["V", "N1"]) + dfunc2(ptags[2:4], ["P", "N2"])
+    #features = features + [nltk.pos_tag(data)]
+    #features = features + [nltk.pos_tag(v), nltk.pos_tag(n1), nltk.pos_tag(n2)]
+    #features.append("s" == n1[-1])
+    #features = features + [nltk.pos_tag_sents(v), nltk.pos_tag(n1), nltk.pos_tag(n2)]
+    
+    
     if "ing" == v[-3:]:
         features.append(True)
         features.append(False)
@@ -779,7 +800,7 @@ def your_feature_extractor(v, n1, p, n2):
     features.append("?" in p)
     features.append("?" in n1)
     features.append("?" in n2)
-    """
+    
     #ed = False
     #ing = False
     #offset = 0
@@ -799,7 +820,7 @@ def your_feature_extractor(v, n1, p, n2):
     #n2p = dfunc([n2, p], ["N2", "P"])
     n3p = [x + y for x,y in zip(dfunc2([n1, p], ["N1", "P"]), dfunc2([n2, p], ["N2", "P"]))]
 
-    features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p + dfunc2([v, n1, p, n2], ["V", "N1", "P", "N2"]) + dfunc2([n2, p, n1, v], ["N2","P","N1","V"]) #+ dfunc2([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
+    features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p + dfunc2([v, n1, p, n2], ["V", "N1", "P", "N2"]) + dfunc2([n2, p, n1, v], ["N2","P","N1","V"]) #+ dfunc2([v, n1, p], ["V", "N1", "P"]) + dfunc2([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
