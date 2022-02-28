@@ -840,9 +840,9 @@ def your_feature_extractor(v, n1, p, n2):
     #features.append(("V-ing", ing))
     #features.append(("V_count", len(ldata[0])-offset))
 
-    #dic = {}
-    #for i, ftr in enumerate(features):
-    #    dic[i] = ftr
+    dic = {}
+    for i, ftr in enumerate(features):
+        dic[i] = ftr
 
     #+ dfunc([p, n2], ["P", "N2"])
     #n1p = dfunc([n1, p], ["N1", "P"])
@@ -853,7 +853,7 @@ def your_feature_extractor(v, n1, p, n2):
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
-    return features
+    return dic #features + dic
 
 
 # Question 9.2 [10 marks]
