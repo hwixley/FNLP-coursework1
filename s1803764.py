@@ -20,7 +20,6 @@ include generated answers.py file.
 
 Best of Luck!
 """
-import operator as op
 from ast import operator
 from cgi import test
 from collections import defaultdict, Counter
@@ -382,24 +381,37 @@ class NaiveBayes:
         ftr_counts = {f: dftrs.count(f) for f in ftrs}
 
         # Compute prior (MLE). Compute likelihood with smoothing.
-        #num_samples = np.sum(list(class_counts.values()))
         num_ftrs = np.sum(list(ftr_counts.values()))
 
         for c in classes:
             prior[c] = class_counts[c]/len(data)
             likelihood[c] = {}
+
+        # Calculate the sum of class prior probabilities
+        tot_cprior_prob = np.sum(list(prior.values()))
+
+        for c in classes:
+            # Divide each prior probability by the sum of prior probabilities over all classes.
+            # This is done to ensure that:
+            # SUM_from(i=1)_to(k) P(c_i) = 1
+            # Which helps negate the effect of floating point errors
+            prior[c] = prior[c]/tot_cprior_prob
             for v in vocab:
                 if not v in cfdist[c].keys():
                     cfdist[c][v] = 0
 
                 prob_cv = cfdist[c][v]/ftr_counts[v]
-                prob_v = ftr_counts[v]/num_ftrs
-                likelihood[c][v] = ((prob_cv) + alpha)/(prior[c] + alpha*len(vocab))
+                likelihood[c][v] = (prob_cv + alpha)/(prior[c] + alpha*len(vocab))
                 assert likelihood[c][v] >= 0
 
-            tot_prob = np.sum(list(likelihood[c].values()))
+            # Calculate the sum of feature likelihood probabilities
+            tot_lh_prob = np.sum(list(likelihood[c].values()))
+            # Divide each likelihood probability by the sum of likelihood probabilities for this feature.
+            # This is done to ensure that:
+            # SUM_from(i=1)_to(n) P(f_i|c) = 1
+            # Which helps negate the effect of floating point errors
             for v in vocab:
-                likelihood[c][v] = likelihood[c][v]/tot_prob
+                likelihood[c][v] = likelihood[c][v]/tot_lh_prob
 
             assert abs(np.sum(list(likelihood[c].values())) - 1) <= 1e-12
             assert prior[c] >= 0
@@ -420,6 +432,7 @@ class NaiveBayes:
         classes = set(self.likelihood.keys())
         c_probs = {}
 
+        # Calculate the sum of feature likelihood probabilities for every feature over all classes
         cftr_lh_count = {}
         for ftr in d:
             if ftr in self.vocab:
@@ -427,13 +440,22 @@ class NaiveBayes:
                 for c in classes:
                     cftr_lh_count[ftr] += self.likelihood[c][ftr]
 
+        # Divide each likelihood probability by the sum of likelihood probabilities for this feature.
+        # This is done to ensure that:
+        # SUM_from(i=1)_to(n) P(f_i|c) = 1
+        # Which helps negate the effect of floating point errors
         for c in classes:
             ftr_likelihoods = [self.likelihood[c][ftr]/cftr_lh_count[ftr] for ftr in d if ftr in self.vocab]
             c_probs[c] = np.prod(ftr_likelihoods)
             assert c_probs[c] >= 0
 
+        # Calculate the sum of class posterior probabilities
         tot_prob = np.sum(list(c_probs.values()))
-        #print(tot_prob)
+
+        # Divide each posterior probability by the sum of posterior probabilities.
+        # This is done to ensure that:
+        # SUM_from(i=1)_to(m) P(c_i|d) = 1
+        # Which helps negate the effect of floating point errors
         for c in classes:
             c_probs[c] = c_probs[c]/tot_prob
 
@@ -465,14 +487,12 @@ def open_question_8() -> str:
     :return: Your answer of 500 characters maximum.
     """
     return inspect.cleandoc("""
-    The best accuracy was achieved using a sequence of words. Indicating that
-    this model is most useful when passed a sequence of words.
-
-    My NB accuracy is worse than all LR scores in Table 1. I believe this
-    difference can mainly be attributed to the NB independence assumption
-    as this infers probability distributions about features that are likely
-    not true. Thus a model that does not assume any distribution would be
-    more useful.
+    The best accuracy was achieved using a sequence of words with labels rather than a single word
+    with no labels. Indicating this model performs best when passed a sequence of words/features,
+    and/or when the feature(s) have labels.
+    My NB model achieved better accuracies for all models in table 1 except the last one. We can
+    imagine this is due to the multi-feature nature of this extractor and the fact that the LR model
+    doesn't assume features are independent of each other given the class unlike NB.
     """)[:500]
 
 
