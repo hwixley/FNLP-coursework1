@@ -577,14 +577,14 @@ def your_feature_extractor(v, n1, p, n2):
     features.append(n2[-1] == "s")
     features.append("?" in n2)
     features.append(n1 == "%")
-    features.append(n1 == "million" or n2 == "million")
+    features.append(n1 == "million")
 
     #Converting to dictionary resulted in improved accuracy
     dic = {}
     for i, ftr in enumerate(features):
         dic[i] = ftr
 
-    return features #dic
+    return dic
 
 
 # Question 9.2 [10 marks]
@@ -603,7 +603,13 @@ def open_question_9():
     Next I wanted to create features that would represent combinations of these features I did this by taking
     all unique tuple permutations of these features (ie. (f1, f2)). This proved useful as it helped
     the model identify common feature combinations.
-    Lastly, I manually separated parts of the verb to get the tense
+    Lastly, I wanted to manually create features to represent common suffixes/values for the features.
+    I did this for the verb by separating the suffix (ie. "ing", "ed) of the verb with it's verb to get the tense,
+    and verb stem.
+    I did this for the nouns by checking if they were plural (ended in "s"), formed a question (contained "?"),
+    or equated to common values (ie. "million" or "%").
+    Due to the nature of how common prepositional phrases are this was not needed due to the existence of the
+    tuple feature combinations.
     """)[:1000]
 
 
@@ -623,7 +629,7 @@ def answers():
 
     global naive_bayes
     global acc_extractor_1, naive_bayes_acc, lr_acc, logistic_regression_model, dev_features
-    
+    """
     print("*** Part I***\n")
 
     print("*** Question 1 ***")
@@ -699,7 +705,7 @@ def answers():
     #     a_logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=6, trace=0)
     #     lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
     #     print(f"Extractor {i}  |  {lr_acc*100}")
-    
+    """
     print("*** Question 9 ***")
     training_features = apply_extractor(your_feature_extractor, ppattach.tuples("training"))
     dev_features = apply_extractor(your_feature_extractor, ppattach.tuples("devset"))
