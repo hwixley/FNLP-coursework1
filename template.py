@@ -281,39 +281,22 @@ def open_question_6():
     :return: your answer [1000 chars max]
     """
     return inspect.cleandoc("""
-    Problems:
     This question is rather vague because...
-    1. It does not detail the era of English.
-    English has been spoken for centuries and has evolved massively using all the data across
-    these centuries together would not be useful due to completely different dialects so I will
-    assume this question refers to the 21st century.
-    2. It does not detail the dialect(s) of English.
-    Due to the fact that English is so widely spoken (many different countries) there are many
-    different dialects with various differences in the spelling of words (ie. British English vs.
-    American English). This is problematic as it would result in not representing equivalent words
-    ("colour" vs. "color") as the same thing. So I will assume the question refers to British
-    English.
-    3. It does not detail the genre of English.
-    Corpora data typically have a genre based on where the data was scraped from (ie. Web News)
-    and thus these are not representative of typical English usage (ie. conversational English).
-    So I will assume that this question refers to balanced genre corpora extracted from the Web.
+    1. It does not detail the era of English to use (ie. 1500s-2000 vs. 21st century).
+    2. It does not detail the dialect(s) of English (ie. British vs. American English).
+    3. The source of English (ie. where we extract the data from). Corpora always have a genre
+    that denotes where the data was extracted from, this has a massive affect on the type of
+    English used (ie. News articles vs. Twitter data).
+    Thus I will assume we are referring to 21st century British English from a balanced Web corpus.
 
     Experiment:
-    1. Find a British English corpora from the 21st-century with a balanced genre that has been
-    extracted from the web.
-    2. Perform necessary preprocessing: tokenise the corpus (split sentences into words).
-    3. Compute a dictionary of word frequencies for all the words in the corpus.
-    4. Compute a dictionary of word priors by dividing the word frequency dictionary by the
-    sum of all frequencies.
-    5. Create a function that calculates entropy of a word using its prior (-prior*log(prior)).
-    4. Iterate this function over all unique words in the corpus and take the mean to get the
-    average word entropy for this corpus.
-
-
-    1. Given Zipf's law we know that the frequency of any word is inversely proportional
-    to its rank in the frequency table indicating the majority of words in English
-    are rarely used. Thus almost making this metric insignificant as the average will likely
-    be quite large.
+    1. Get a 21st-century British English corpus with a balanced Web genre.
+    2. Tokenise the corpus.
+    3. Compute word frequencies for all the words in the corpus.
+    4. Compute word priors by dividing the word frequency by the sum of all frequencies.
+    These priors should be smoothed to ensure we have no zero probabilities.
+    5. Calculate entropy of each word using its prior.
+    4. Take the mean of these entropies.
     """)[:1000]
 
 
@@ -608,8 +591,7 @@ def open_question_9():
     and verb stem.
     I did this for the nouns by checking if they were plural (ended in "s"), formed a question (contained "?"),
     or equated to common values (ie. "million" or "%").
-    Due to the nature of how common prepositional phrases are this was not needed due to the existence of the
-    tuple feature combinations.
+    I did not need to do this fo the prepositions due to the existence of the tuple feature combinations.
     """)[:1000]
 
 
@@ -629,7 +611,7 @@ def answers():
 
     global naive_bayes
     global acc_extractor_1, naive_bayes_acc, lr_acc, logistic_regression_model, dev_features
-    """
+    
     print("*** Part I***\n")
 
     print("*** Question 1 ***")
@@ -705,7 +687,7 @@ def answers():
     #     a_logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=6, trace=0)
     #     lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
     #     print(f"Extractor {i}  |  {lr_acc*100}")
-    """
+    
     print("*** Question 9 ***")
     training_features = apply_extractor(your_feature_extractor, ppattach.tuples("training"))
     dev_features = apply_extractor(your_feature_extractor, ppattach.tuples("devset"))
