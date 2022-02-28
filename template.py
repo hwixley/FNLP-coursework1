@@ -513,221 +513,6 @@ def feature_extractor_4(v, n1, p, n2):
 def feature_extractor_5(v, n1, p, n2):
     return [("v", v), ("n1", n1), ("p", p), ("n2", n2)]
 
-# Q9.1: Supplementary Function
-# ----------------------------
-# Get features for the given word
-# -------------------------------
-def word_ftrs(word, str):
-    features = []
-    #features.append((f"{str}_steps", len(word)*)
-    features.append((f"{str}_count",len(word)))
-    features.append((f"{str}_0upper",word[0].isupper()))
-    features.append((f"{str}_0vowel", word[0].lower() in "aeiou"))
-    features.append((f"{str}_0", word[0]))
-    #features.append((f"{str}_-1plural",  word[-2:].lower() == "es" if len(word) > 1 else False))
-    #features.append((f"{str}_-1s",  word[-1].lower() == "s"))
-    features.append((f"{str}_-1", word[-1]))
-
-    return features
-
-# Q9.1: Supplementary Function
-# ----------------------------
-# Parse a word into 2 numerical values
-# ------------------------------------
-# Uses a step as a means to give more significance
-# to adjacent letter combinations (which also helps
-# prevent classifying 2 words with the same letters
-# as the same thing)
-def parse_word(word, step):
-    # primes: used to hold the identifiers for all our characters
-    #primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,59,61,67,71,73,79,83,89,97,101,103,107,109,113, 127, 131, 139, 149, 151, 157, 163, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227, 229, 233, 239, 241, 251, 257, 263, -269]
-    letters = "eariotnslcudpmhgbfywkvxzjq" # ordered by English letter frequency
-    #numbers = "0123456789" # ascending order
-    #punctuation = ".?!,:;'\"-$%&*()+#/" # arbitrary order
-
-    sum = 0
-    prod = 1
-    temp_sum = 0
-    temp_prod = 1
-    for i, c in enumerate(word):
-        #idx = -1
-        #if c.lower() in letters:
-        #    idx = letters.index(c.lower())
-        #elif c in numbers:
-        #    idx = 26 + numbers.index(c)
-        #elif c in punctuation:
-        #    idx = 36 + punctuation.index(c)
-        char = c
-        if c.lower() in letters:
-            char = c.lower()
-
-        if i % step == 0:
-            if step == 1:
-                sum += ord(char)
-            else:
-                sum += temp_sum*ord(char) #primes[idx]
-            prod = prod*(temp_prod + ord(char)) #primes[idx])
-            temp_sum = 0
-            temp_prod = 1
-        else:
-            temp_sum += ord(char) #primes[idx]
-            temp_prod = temp_prod*ord(char) #primes[idx]
-
-    return sum, prod
-
-# Q9.1: Supplementary Function
-# ----------------------------
-# Extracts features from the numerical values associated
-# with these words (calculated in parse_word)
-# ------------------------------------------------------
-def parse_words(sums, prods):
-    N = len(sums)
-    S = len(sums[0])
-    assert(N == len(prods))
-    assert(S == len(prods[0]))
-    features = []
-
-    suml, prodl, spl, s_pl = [], [], [], []
-
-    sum, prod = 0, 1
-    for j in range(S):
-        #tsum = 0
-        #tprod = 1
-
-        for i in range(N):
-            #tsum += sums[i][j]
-            #tprod = tprod*prods[i][j]
-            sum += sums[i][j]
-            prod = prod*prods[i][j]
-        #features.append(sum) #, prod, sum*prod, sum + prod))
-        #features.append(prod)
-        #features.append(sum*prod)
-        #features.append(sum + prod)
-        
-        suml.append(sum) #, prod, sum*prod, sum + prod))
-        prodl.append(prod)
-        spl.append(sum*prod)
-        s_pl.append(sum + prod)
-
-    #print(s_pl)
-    features = [int(10*el/np.max(suml)) for el in suml] + [int(10*el/np.max(prodl)) for el in prodl] +  [int(10*el/np.max(spl)) for el in spl] + [int(10*el/np.max(s_pl)) for el in s_pl]
-    
-    return features
-
-# Q9.1: Supplementary Function
-# ----------------------------
-# Extracts features for the given word combinations
-# -------------------------------------------------
-def dfunc2(data, strs):
-    #vowels = "aeiou"
-    #abc = "abcdefghijklmnopqrstuvwxyz"
-    features = []
-
-    sums = []
-    prods = []
-    for i, d in enumerate(data):
-        steps = [1,2,3]
-        sum_list = []
-        prod_list = []
-
-        for s in steps:
-            sum, prod = parse_word(d, s)
-            features.append((f"{strs[i]}_{s}_sum",sum))
-            features.append((f"{strs[i]}_{s}_prod",prod))
-            sum_list.append(sum)
-            prod_list.append(prod)
-
-        sums.append(sum_list)
-        prods.append(prod_list)
-
-    ftrs = parse_words(sums, prods)
-
-    return features + ftrs
-
-
-def dfunc(data, strs):
-    vowels = "aeiou"
-    abc = "abcdefghijklmnopqrstuvwxyz"
-    primes = [2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,59,61,67,71,73,79,83,89,97,101,103]
-    features = []
-
-    t_vprod, t_tprod, t_sprod, t_uprod = 1, 1, 1, 1
-    t_vsum, t_tsum, t_ssum, t_usum = 0, 0, 0, 0
-    for i,d in enumerate(data):
-        #print(train_d.similar(d))
-        #features.append((f"{strs[i]}_similar",train_d.similar(d)))
-
-        #features.append((f"{strs[i]}_count",len(d)))
-        #features.append((f"{strs[i]}_0upper",d[0].isupper()))
-        #features.append((f"{strs[i]}_0vowel",d[0] in vowels))
-        #features.append((f"{strs[i]}_0",d[0]))
-        #features.append((f"{strs[i]}_-1",d[-1]))
-        #features.append((f"{strs[i]}_0alpha", d[0].lower() in abc))
-        #features.append((f"{strs[i]}_-1alpha", d[-1].lower() in abc))
-
-        #alpha_count = 0
-        vowel_count = 0
-        vprod, tprod, sprod, uprod = 1, 1, 1, 1
-        vsum, tsum, ssum, usum = 0, 0, 0, 0
-        for j,c in enumerate(d):
-            if c.lower() in vowels:
-                vowel_count += 1
-
-            val = primes[abc.find(c.lower())]
-            vprod = vprod*val
-            vsum += val
-            if j>0 and j % 2 == 0:
-                tsum += (val - primes[abc.find(d[j-1].lower())])**2
-                tprod = tprod*(val - primes[abc.find(d[j-1].lower())])**2
-            if j>0 and j % 3 == 0:
-                ssum += (val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2)#/primes[abc.find(d[j-2].lower())]
-                sprod = sprod*((val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]))**2#/primes[abc.find(d[j-2].lower())])**2
-            if j>0 and j % 4 == 0:
-                usum += (val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2 - primes[abc.find(d[j-3].lower())]**3)#/primes[abc.find(d[j-2].lower())]
-                uprod = uprod*((val - primes[abc.find(d[j-1].lower())] - primes[abc.find(d[j-2].lower())]**2 - primes[abc.find(d[j-3].lower())]**3))**2#/primes[abc.find(d[j-2].lower())])**2
-
-        #features.append(alpha_count) #(f"{strs[i]}_alpha_count",alpha_count))
-        #features.append(alpha_count/len(d)) #(f"{strs[i]}_alpha_mean",alpha_count/len(d)))
-        features.append(vowel_count) #(f"{strs[i]}_vowel_count",vowel_count))
-        features.append(vowel_count/len(d)) #(f"{strs[i]}_vowel_mean",vowel_count/len(d)))
-        features.append(vprod) #(f"{strs[i]}_vprod",vprod))
-        features.append(vsum) #(f"{strs[i]}_vsum",vsum))
-        features.append(tsum) #(f"{strs[i]}_tsum",tsum))
-        features.append(tprod) #(f"{strs[i]}_tprod",tprod))
-        features.append(ssum) #(f"{strs[i]}_ssum",ssum))
-        features.append(sprod) #(f"{strs[i]}_sprod",sprod))
-        features.append(usum) #(f"{strs[i]}_usum",usum))
-        features.append(uprod) #(f"{strs[i]}_uprod",uprod))
-            #features.append(idx)
-            #features.append(abc.find(c.lower())**2*d.lower().count(c.lower()))
-
-        #for v in vowels:
-            #features.append(d.lower().count(v))
-        for letter in abc:
-            features.append((f"{strs[i]}-{letter}_count",d.lower().count(letter)))
-        features.append((f"{strs[i]}_upper_count",np.sum([1 for c in d if c.isupper()])))
-
-        t_sprod = t_sprod*sprod
-        t_vprod = t_vprod*vprod
-        t_tprod = t_tprod*tprod
-        t_uprod = t_uprod*uprod
-        t_ssum += ssum
-        t_vsum += vsum
-        t_tsum += tsum
-        t_usum += usum
-
-        #features.append((f"{strs[i]}_alpha_count",t_alpha_count))
-        #features.append((f"{strs[i]}_vowel_count",t_vowel_count))
-        features.append((f"{strs[i]}_vprod",t_vprod))
-        features.append((f"{strs[i]}_vsum",t_vsum))
-        features.append((f"{strs[i]}_tsum",t_tsum))
-        features.append((f"{strs[i]}_tprod",t_tprod))
-        features.append((f"{strs[i]}_ssum",t_ssum))
-        features.append((f"{strs[i]}_sprod",t_sprod))
-        features.append((f"{strs[i]}_usum",t_usum))
-        features.append((f"{strs[i]}_uprod",t_uprod))
-    return features
-
 # Question 9.1 [5 marks]
 def your_feature_extractor(v, n1, p, n2):
     """vsumvsum
@@ -746,36 +531,15 @@ def your_feature_extractor(v, n1, p, n2):
     """
     data = [v, n1, p, n2]
     features = []
-    #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
-    #features = [("v", v), ("n1", n1), ("p", p), ("n2", n2), ("n1-p", (n1, p)), ("n2-p", (n2, p)), ("v-n2", (v, n2)), ("v-p", (v, p))]
-    #features = features + word_ftrs(v, "v") + word_ftrs(n1, "n1") + word_ftrs(n2, "n2") + word_ftrs(p, "p")
-    # Verb features
 
-    strs = ["V", "N1", "P", "N2"]
     for i in range(4):
         features.append(data[i])
         for j in range(4):
             if i != j:
                 features.append((data[i],data[j]))
 
-    #tagsets = ["universal", "wsj", "brown"]
-    #ptags = []
-    #for t in tagsets:
-    #    ptags = ptags + [ptag[1] for ptag in nltk.pos_tag(data, tagset=t)]
     ptags = [ptag[1] for ptag in nltk.pos_tag(data)]
-    #print(ptags)
-    #joint_ptags = []
-    #for i in range(len(ptags)):
-    #    for j in range(len(ptags)):
-    #        if i != j:
-    #            joint_ptags.append(ptags[i] + ptags[j])
-    features = features + ptags #+ joint_ptags
-    #features = features + dfunc2(ptags[0:2], ["V", "N1"]) + dfunc2(ptags[2:4], ["P", "N2"])
-    #features = features + [nltk.pos_tag(data)]
-    #features = features + [nltk.pos_tag(v), nltk.pos_tag(n1), nltk.pos_tag(n2)]
-    #features.append("s" == n1[-1])
-    #features = features + [nltk.pos_tag_sents(v), nltk.pos_tag(n1), nltk.pos_tag(n2)]
-    
+    features = features + ptags
     
     if "ing" == v[-3:]:
         features.append(True)
@@ -802,22 +566,13 @@ def your_feature_extractor(v, n1, p, n2):
     features.append(n1[-1] == "s")
     features.append(n2[-1] == "s")
     
-    #features.append("?" in v)
-    #features.append("?" in p)
-    #features.append("?" in n1)
     features.append("?" in n2)
 
     dic = {}
     for i, ftr in enumerate(features):
         dic[i] = ftr
 
-    #+ dfunc([p, n2], ["P", "N2"])
-    #n1p = dfunc([n1, p], ["N1", "P"])
-    #n2p = dfunc([n2, p], ["N2", "P"])
-    #n3p = [x + y for x,y in zip(dfunc2([n1, p], ["N1", "P"]), dfunc2([n2, p], ["N2", "P"]))]
-
-    #features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p + dfunc2([v, n1, p, n2], ["V", "N1", "P", "N2"]) + dfunc2([n2, p, n1, v], ["N2","P","N1","V"]) #+ dfunc2([v, n1, p], ["V", "N1", "P"]) + dfunc2([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
-    return dic #features + dic
+    return dic
 
 
 # Question 9.2 [10 marks]
@@ -830,16 +585,10 @@ def open_question_9():
     :return: Your answer of 1000 characters maximum.
     """
     return inspect.cleandoc("""
-    Feature templates:
-    Due to the fact models perform best with numerical data I wanted to create a way
-    to represent words and combinations of words numerically. In order to do this I
-    decided to use ord() to retrieve the ASCII code for each letter in a word and use
-    it to calculate values that would form as representations for the words to which
-    these letters belong.
-
     I first decided to include the unformatted features individually as this will allow our
-    model to fit classes based on specific values for these features.
-    Next 
+    model to fit classes based on specific values for these features. This proved particularly
+    useful for prepositions such as "of".
+    Next O 
 
     """)[:1000]
 
@@ -860,7 +609,7 @@ def answers():
 
     global naive_bayes
     global acc_extractor_1, naive_bayes_acc, lr_acc, logistic_regression_model, dev_features
-    """
+    
     print("*** Part I***\n")
 
     print("*** Question 1 ***")
@@ -920,7 +669,7 @@ def answers():
     print("*** Question 8 ***")
     answer_open_question_8 = open_question_8()
     print(answer_open_question_8)
-    """
+    
     # This is the code that generated the results in the table of the CW:
 
     # A single iteration of suffices for logistic regression for the simple feature extractors.
