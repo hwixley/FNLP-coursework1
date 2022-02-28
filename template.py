@@ -590,7 +590,6 @@ def parse_words(sums, prods):
     suml, prodl, spl, s_pl = [], [], [], []
 
     sum, prod = 0, 1
-    max_sum, max_prod, max_sp, max_s_p = -9e+10, -9e+10, -9e+10, -9e+10
     for j in range(S):
         #tsum = 0
         #tprod = 1
@@ -600,26 +599,19 @@ def parse_words(sums, prods):
             #tprod = tprod*prods[i][j]
             sum += sums[i][j]
             prod = prod*prods[i][j]
-        features.append(sum) #, prod, sum*prod, sum + prod))
-        features.append(prod)
-        features.append(sum*prod)
-        features.append(sum + prod)
-        """
+        #features.append(sum) #, prod, sum*prod, sum + prod))
+        #features.append(prod)
+        #features.append(sum*prod)
+        #features.append(sum + prod)
+        
         suml.append(sum) #, prod, sum*prod, sum + prod))
         prodl.append(prod)
         spl.append(sum*prod)
         s_pl.append(sum + prod)
 
-        if sum > max_sum:
-            max_sum = sum
-        if prod > max_prod:
-            max_prod = prod
-        if spl[-1] > max_sp:
-            max_sp = sum*prod
-        if s_pl[-1] > max_s_p:
-            max_s_p = sum+prod
-    features = [el/max_sum for el in suml] + [el/max_prod for el in prod] +  [el/max_sp for el in spl] + [el/max_s_p for el in s_pl]
-    """
+    #print(s_pl)
+    features = [int(10*el/np.max(suml)) for el in suml] + [int(10*el/np.max(prodl)) for el in prodl] +  [int(10*el/np.max(spl)) for el in spl] + [int(10*el/np.max(s_pl)) for el in s_pl]
+    
     return features
 
 # Q9.1: Supplementary Function
@@ -761,16 +753,15 @@ def your_feature_extractor(v, n1, p, n2):
 
     strs = ["V", "N1", "P", "N2"]
     for i in range(4):
-        #features.append((f"{strs[i]}", data[i]))
         features.append(data[i])
         for j in range(4):
             if i != j:
                 features.append((data[i],data[j]))
-                #for k in range(4):
-                #    if k != j and k != i:
-                #        features.append((f"{strs[i]}-{strs[j]}-{strs[k]}",(data[i],data[j],data[k])))
 
-    #features = features + [("v-p", v+p), ("n1-p", n1+p), ("n2-p", n2+p), ("n1-n2-p", n1+n2+p)]
+    #tagsets = ["universal", "wsj", "brown"]
+    #ptags = []
+    #for t in tagsets:
+    #    ptags = ptags + [ptag[1] for ptag in nltk.pos_tag(data, tagset=t)]
     ptags = [ptag[1] for ptag in nltk.pos_tag(data)]
     #print(ptags)
     #joint_ptags = []
@@ -806,42 +797,15 @@ def your_feature_extractor(v, n1, p, n2):
         features.append(False)
         features.append(False)
         features.append(v)
-    
-    #features.append(v == "is")
-    #features.append(v == "be")
-    #features.append(v == "am")
-    #features.append(v == "have")
-    #features.append(v == "do")
-    #features.append(v == "go")
+
     #Noun1 features
     features.append(n1[-1] == "s")
     features.append(n2[-1] == "s")
     
-    features.append("?" in v)
-    features.append("?" in p)
-    features.append("?" in n1)
+    #features.append("?" in v)
+    #features.append("?" in p)
+    #features.append("?" in n1)
     features.append("?" in n2)
-
-    #step_sizes = [2,3]
-    #for d in data:
-    #    for s in step_sizes:
-    #        steps = int(len(d)/s)
-    #        for i in range(steps):
-    #            print(d[i*s:i*s + s])
-    #            features.append(d[i*s:i*s + s])
-    #prefix_sizes = [4,]
-
-    #ed = False
-    #ing = False
-    #offset = 0
-    #if "ed" == ldata[0][-2:]:
-    #    ed = True
-    #    offset = -2
-    #elif "ing" == ldata[0][-3:]:
-    #    ing = True
-    #features.append(("V-ed", ed))
-    #features.append(("V-ing", ing))
-    #features.append(("V_count", len(ldata[0])-offset))
 
     dic = {}
     for i, ftr in enumerate(features):
@@ -853,9 +817,6 @@ def your_feature_extractor(v, n1, p, n2):
     #n3p = [x + y for x,y in zip(dfunc2([n1, p], ["N1", "P"]), dfunc2([n2, p], ["N2", "P"]))]
 
     #features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p + dfunc2([v, n1, p, n2], ["V", "N1", "P", "N2"]) + dfunc2([n2, p, n1, v], ["N2","P","N1","V"]) #+ dfunc2([v, n1, p], ["V", "N1", "P"]) + dfunc2([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
-
-    #raise NotImplementedError  # remove when you finish defining this function
-    #print(len(features))
     return dic #features + dic
 
 
@@ -875,6 +836,10 @@ def open_question_9():
     decided to use ord() to retrieve the ASCII code for each letter in a word and use
     it to calculate values that would form as representations for the words to which
     these letters belong.
+
+    I first decided to include the unformatted features individually as this will allow our
+    model to fit classes based on specific values for these features.
+    Next 
 
     """)[:1000]
 
