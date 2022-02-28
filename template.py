@@ -20,6 +20,7 @@ include generated answers.py file.
 
 Best of Luck!
 """
+import operator as op
 from ast import operator
 from cgi import test
 from collections import defaultdict, Counter
@@ -533,25 +534,34 @@ def your_feature_extractor(v, n1, p, n2):
     features = []
 
     for i in range(4):
+        # Singleton feature
         features.append(data[i])
         for j in range(4):
             if i != j:
+                # Tuple of features
                 features.append((data[i],data[j]))
 
     ptags = [ptag[1] for ptag in nltk.pos_tag(data)]
     features = features + ptags
     
+    #Verb features
     if "ing" == v[-3:]:
         features.append(True)
         features.append(False)
         features.append(False)
-        features.append(v[:-3])
+        if v[-4] != "y":
+            features.append(v[:-3] + "e")
+        else:
+            features.append(v[:-3])
     elif "ed" == v[-2:]:
         features.append(False)
         features.append(True)
         features.append(False)
-        features.append(v[:-2])
-    elif "s" == v[-1]:
+        if len(v) > 4 and v[-4] in "aeiou":
+            features.append(v[:-3])
+        else:
+            features.append(v[:-2] + "e")
+    elif "s" == v[-1] and len(v) > 2:
         features.append(False)
         features.append(False)
         features.append(True)
@@ -562,17 +572,19 @@ def your_feature_extractor(v, n1, p, n2):
         features.append(False)
         features.append(v)
 
-    #Noun1 features
+    #Noun features
     features.append(n1[-1] == "s")
     features.append(n2[-1] == "s")
-    
     features.append("?" in n2)
+    features.append(n1 == "%")
+    features.append(n1 == "million" or n2 == "million")
 
+    #Converting to dictionary resulted in improved accuracy
     dic = {}
     for i, ftr in enumerate(features):
         dic[i] = ftr
 
-    return dic
+    return features #dic
 
 
 # Question 9.2 [10 marks]
@@ -586,10 +598,12 @@ def open_question_9():
     """
     return inspect.cleandoc("""
     I first decided to include the unformatted features individually as this will allow our
-    model to fit classes based on specific values for these features. This proved particularly
+    model to fit classes based on specific values for these features (like a unigram). This proved particularly
     useful for prepositions such as "of".
-    Next O 
-
+    Next I wanted to create features that would represent combinations of these features I did this by taking
+    all unique tuple permutations of these features (ie. (f1, f2)). This proved useful as it helped
+    the model identify common feature combinations.
+    Lastly, I manually separated parts of the verb to get the tense
     """)[:1000]
 
 
@@ -657,8 +671,7 @@ def answers():
     print("*** Question 6 ***")
     answer_open_question_6 = open_question_6()
     print(answer_open_question_6)
-    """
-    """
+    
     print("*** Part II***\n")
 
     print("*** Question 7 ***")
@@ -686,7 +699,6 @@ def answers():
     #     a_logistic_regression_model = NltkClassifierWrapper(MaxentClassifier, training_features, max_iter=6, trace=0)
     #     lr_acc = compute_accuracy(a_logistic_regression_model, dev_features)
     #     print(f"Extractor {i}  |  {lr_acc*100}")
-    
     
     print("*** Question 9 ***")
     training_features = apply_extractor(your_feature_extractor, ppattach.tuples("training"))
