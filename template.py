@@ -761,10 +761,11 @@ def your_feature_extractor(v, n1, p, n2):
 
     strs = ["V", "N1", "P", "N2"]
     for i in range(4):
-        features.append((f"{strs[i]}", data[i]))
+        #features.append((f"{strs[i]}", data[i]))
+        features.append(data[i])
         for j in range(4):
             if i != j:
-                features.append((f"{strs[i]}-{strs[j]}",(data[i],data[j])))
+                features.append((data[i],data[j]))
                 #for k in range(4):
                 #    if k != j and k != i:
                 #        features.append((f"{strs[i]}-{strs[j]}-{strs[k]}",(data[i],data[j],data[k])))
