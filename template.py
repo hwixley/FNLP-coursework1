@@ -753,10 +753,18 @@ def your_feature_extractor(v, n1, p, n2):
     :return: A list of features produced by you.
     """
     data = [v, n1, p, n2]
+    features = []
     #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
-    features = [("v", v), ("n1", n1), ("p", p), ("n2", n2), ("n1-p", (n1, p)), ("n2-p", (n2, p)), ("v-n2", (v, n2)), ("v-p", (v, p))]
+    #features = [("v", v), ("n1", n1), ("p", p), ("n2", n2), ("n1-p", (n1, p)), ("n2-p", (n2, p)), ("v-n2", (v, n2)), ("v-p", (v, p))]
     features = features + word_ftrs(v, "v") + word_ftrs(n1, "n1") + word_ftrs(n2, "n2") + word_ftrs(p, "p")
     # Verb features
+
+    strs = ["V", "N1", "P", "N2"]
+    for i in range(4):
+        features.append((f"{strs[i]}", data[i]))
+        for j in range(4):
+            if i != j:
+                features.append((f"{strs[i]}-{strs[j]}",(data[i],data[j])))
 
     #features = features + [("v-p", v+p), ("n1-p", n1+p), ("n2-p", n2+p), ("n1-n2-p", n1+n2+p)]
     ptags = [ptag[1] for ptag in nltk.pos_tag(data)]
