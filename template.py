@@ -25,6 +25,7 @@ from cgi import test
 from collections import defaultdict, Counter
 import enum
 from lib2to3.pgen2 import token
+from ntpath import join
 from operator import itemgetter
 from string import punctuation
 from bleach import clean
@@ -759,8 +760,13 @@ def your_feature_extractor(v, n1, p, n2):
 
     #features = features + [("v-p", v+p), ("n1-p", n1+p), ("n2-p", n2+p), ("n1-n2-p", n1+n2+p)]
     ptags = [ptag[1] for ptag in nltk.pos_tag(data)]
-    #joint_ptags = [(ptag, ptags[i+1]) for i, ptag in ptags if i+1 < len(ptags)]
-    features = features + ptags
+    #print(ptags)
+    #joint_ptags = []
+    #for i in range(len(ptags)):
+    #    for j in range(len(ptags)):
+    #        if i != j:
+    #            joint_ptags.append(ptags[i] + ptags[j])
+    features = features + ptags #+ joint_ptags
     #features = features + dfunc2(ptags[0:2], ["V", "N1"]) + dfunc2(ptags[2:4], ["P", "N2"])
     #features = features + [nltk.pos_tag(data)]
     #features = features + [nltk.pos_tag(v), nltk.pos_tag(n1), nltk.pos_tag(n2)]
@@ -789,19 +795,28 @@ def your_feature_extractor(v, n1, p, n2):
         features.append(False)
         features.append(v)
     
-    features.append(v == "is")
-    features.append(v == "be")
-    features.append(v == "am")
-    features.append(v == "have")
-    features.append(v == "do")
-    features.append(v == "go")
+    #features.append(v == "is")
+    #features.append(v == "be")
+    #features.append(v == "am")
+    #features.append(v == "have")
+    #features.append(v == "do")
+    #features.append(v == "go")
     #Noun1 features
     features.append(n1[-1] == "s")
     features.append("?" in v)
     features.append("?" in p)
     features.append("?" in n1)
     features.append("?" in n2)
-    
+
+    #step_sizes = [2,3]
+    #for d in data:
+    #    for s in step_sizes:
+    #        steps = int(len(d)/s)
+    #        for i in range(steps):
+    #            print(d[i*s:i*s + s])
+    #            features.append(d[i*s:i*s + s])
+    #prefix_sizes = [4,]
+
     #ed = False
     #ing = False
     #offset = 0
