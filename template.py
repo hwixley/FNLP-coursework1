@@ -814,6 +814,8 @@ def your_feature_extractor(v, n1, p, n2):
     #features.append(v == "go")
     #Noun1 features
     features.append(n1[-1] == "s")
+    features.append(n2[-1] == "s")
+    
     features.append("?" in v)
     features.append("?" in p)
     features.append("?" in n1)
