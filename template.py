@@ -597,7 +597,7 @@ def parse_words(sums, prods):
             tprod = tprod*prods[i][j]
             sum += sums[i][j]
             prod = prod*prods[i][j]
-        features.append(sum)
+        features.append(sum) #, prod, sum*prod, sum + prod))
         features.append(prod)
         features.append(sum*prod)
         features.append(sum + prod)
@@ -732,19 +732,54 @@ def your_feature_extractor(v, n1, p, n2):
     :type v: str
     :param v: The verb.
     :type n1: str
-    :param n1: Head of the object NP.
+    :param n1: Head of the object NP (Noun Phrase).
     :type p: str
     :param p: The preposition.
     :type n2: str
-    :param n2: Head of the NP embedded in the PP.
+    :param n2: Head of the NP embedded in the PP (Prepositional Phrase).
     :rtype: list(any)
     :return: A list of features produced by you.
     """
     #data = [v, n1, p, n2]
     #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
-    features = [("v", v), ("n1", n1), ("p", p), ("n2", n2), ("n1-p", n1 + " " + p), ("n2-p", n2 + " " + p), ("v-n2", v + " " + n2)]
+    features = [("v", v), ("n1", n1), ("p", p), ("n2", n2), ("n1-p", (n1, p)), ("n2-p", (n2, p)), ("v-n2", (v, n2)), ("v-p", (v, p))]
     features = features + word_ftrs(v, "v") + word_ftrs(n1, "n1") + word_ftrs(n2, "n2") + word_ftrs(p, "p")
     # Verb features
+    """
+    if "ing" == v[-3:]:
+        features.append(True)
+        features.append(False)
+        features.append(False)
+        features.append(v[:-3])
+    elif "ed" == v[-2:]:
+        features.append(False)
+        features.append(True)
+        features.append(False)
+        features.append(v[:-2])
+    elif "s" == v[-1]:
+        features.append(False)
+        features.append(False)
+        features.append(True)
+        features.append(v[:-1])
+    else:
+        features.append(False)
+        features.append(False)
+        features.append(False)
+        features.append(v)
+    
+    features.append(v == "is")
+    features.append(v == "be")
+    features.append(v == "am")
+    features.append(v == "have")
+    features.append(v == "do")
+    features.append(v == "go")
+    #Noun1 features
+    features.append(n1[-1] == "s")
+    features.append("?" in v)
+    features.append("?" in p)
+    features.append("?" in n1)
+    features.append("?" in n2)
+    """
     #ed = False
     #ing = False
     #offset = 0
@@ -758,12 +793,13 @@ def your_feature_extractor(v, n1, p, n2):
     #features.append(("V_count", len(ldata[0])-offset))
 
 
+
     #+ dfunc([p, n2], ["P", "N2"])
     #n1p = dfunc([n1, p], ["N1", "P"])
     #n2p = dfunc([n2, p], ["N2", "P"])
     n3p = [x + y for x,y in zip(dfunc2([n1, p], ["N1", "P"]), dfunc2([n2, p], ["N2", "P"]))]
 
-    features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p + dfunc2([v, n1, p, n2], ["V", "N1", "P", "N2"]) #+ dfunc2([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
+    features = features + dfunc2([v, n1], ["V", "N1"]) + dfunc2([v, n2], ["V", "N2"]) + dfunc2([p, v], ["P", "V"]) + n3p + dfunc2([v, n1, p, n2], ["V", "N1", "P", "N2"]) + dfunc2([n2, p, n1, v], ["N2","P","N1","V"]) #+ dfunc2([v, n1, p], ["V", "N1", "P"]) #+ dfunc([n1, p, n2], ["N1", "P", "N2"]) #+ dfunc([v, n1, p, n2], ["V", "N1", "P", "N2"])
 
     #raise NotImplementedError  # remove when you finish defining this function
     #print(len(features))
