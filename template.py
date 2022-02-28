@@ -756,7 +756,7 @@ def your_feature_extractor(v, n1, p, n2):
     features = []
     #lfreqs = {"e": 57, "a": 43, "r": 39, "i": 38, "o": 37, "t": 36}
     #features = [("v", v), ("n1", n1), ("p", p), ("n2", n2), ("n1-p", (n1, p)), ("n2-p", (n2, p)), ("v-n2", (v, n2)), ("v-p", (v, p))]
-    features = features + word_ftrs(v, "v") + word_ftrs(n1, "n1") + word_ftrs(n2, "n2") + word_ftrs(p, "p")
+    #features = features + word_ftrs(v, "v") + word_ftrs(n1, "n1") + word_ftrs(n2, "n2") + word_ftrs(p, "p")
     # Verb features
 
     strs = ["V", "N1", "P", "N2"]
@@ -765,6 +765,9 @@ def your_feature_extractor(v, n1, p, n2):
         for j in range(4):
             if i != j:
                 features.append((f"{strs[i]}-{strs[j]}",(data[i],data[j])))
+                #for k in range(4):
+                #    if k != j and k != i:
+                #        features.append((f"{strs[i]}-{strs[j]}-{strs[k]}",(data[i],data[j],data[k])))
 
     #features = features + [("v-p", v+p), ("n1-p", n1+p), ("n2-p", n2+p), ("n1-n2-p", n1+n2+p)]
     ptags = [ptag[1] for ptag in nltk.pos_tag(data)]
@@ -837,7 +840,9 @@ def your_feature_extractor(v, n1, p, n2):
     #features.append(("V-ing", ing))
     #features.append(("V_count", len(ldata[0])-offset))
 
-
+    #dic = {}
+    #for i, ftr in enumerate(features):
+    #    dic[i] = ftr
 
     #+ dfunc([p, n2], ["P", "N2"])
     #n1p = dfunc([n1, p], ["N1", "P"])
